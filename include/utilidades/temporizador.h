@@ -1,0 +1,8 @@
+//
+// Created by ronald on 11/3/26.
+//
+
+#ifndef PROYECTO1_TEMPORIZADOR_H
+#define PROYECTO1_TEMPORIZADOR_H
+
+#endif //PROYECTO1_TEMPORIZADOR_H
