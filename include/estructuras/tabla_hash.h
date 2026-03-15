@@ -19,58 +19,28 @@ private:
     // tamaño del arreglo
     int capacidad;
 
-public:
-    // constructor
-    TablaHash(int capacidad){
-
-        // guardar capacidad
-        this->capacidad = capacidad;
-
-        // crear arreglo de listas
-        tabla = new ListaEnlazada<Producto*>*[capacidad];
-
-        // inicializar cada posicion
-        for(int i = 0; i < capacidad; i++){
-            tabla[i] = new ListaEnlazada<Producto*>();
-        }
-    }
-
     // funcion hash que convierte el codigo de barras en un indice
-    int funcionHash(std::string codigo){
-        int suma = 0;
-        // recorrer caracteres del codigo
-        for(char c : codigo){
-            suma = suma * 31 + c; // sumar valor ascii
-        }
+    int funcionHash(std::string codigo);
 
-        // obtener posicion dentro del arreglo
-        return suma % capacidad;
-    }
+    // funcion auxiliar para comparar productos por codigo de barras
+    static bool compararCodigo(Producto* a, Producto* b);
+
+public:
+
+    // constructor
+    TablaHash(int capacidad);
+
+    // destructor
+    ~TablaHash();
 
     // insertar producto en la tabla
-    void insertar(Producto* producto){
-
-        // calcular indice hash
-        int indice = funcionHash(producto->codigo_barra);
-
-        // insertar producto en lista correspondiente
-        tabla[indice]->insertarInicio(producto);
-    }
+    void insertar(Producto* producto);
 
     // buscar producto por codigo de barras
-    Producto* buscar(std::string codigo){
-        int indice = funcionHash(codigo);
+    Producto* buscar(std::string codigo);
 
-        NodoLista<Producto*>* actual = tabla[indice]->obtenerCabeza();
-
-        while(actual != nullptr){
-            if(actual->dato->codigo_barra == codigo){
-                return actual->dato;
-            }
-            actual = actual->siguiente;
-        }
-        return nullptr;
-    }
+    // eliminar producto por codigo de barras
+    bool eliminar(std::string codigo);
 
 };
 #endif //PROYECTO1_TABLA_HASH_H
