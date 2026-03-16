@@ -207,7 +207,6 @@ NodoAVL* ArbolAVL::eliminarRec(NodoAVL* nodo, std::string nombre){
 
         // Caso 3: nodo con dos hijos
         else{
-
             // se obtiene el sucesor inorder (el  nodo mas pequenio del subarbol derecho
             NodoAVL* temp = nodoMinimo(nodo->derecha);
 
@@ -219,11 +218,9 @@ NodoAVL* ArbolAVL::eliminarRec(NodoAVL* nodo, std::string nombre){
         }
     }
 
-
     // si despues de  eliminar el arbol queda vacio
     if(nodo == nullptr)
         return nodo;
-
 
     // actualizar altura
     nodo->altura = 1 + maximo(altura(nodo->izquierda), altura(nodo->derecha));
@@ -269,7 +266,6 @@ Producto* ArbolAVL::buscarRec(NodoAVL* nodo, std::string nombre){
 
 // recorrido inorder: permite obtener los productos ordenados por nombre
 void ArbolAVL::inorderRec(NodoAVL* nodo){
-
     if(nodo == nullptr)
         return;
 

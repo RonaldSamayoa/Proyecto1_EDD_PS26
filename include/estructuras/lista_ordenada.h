@@ -11,7 +11,6 @@ template<typename T>
 class ListaOrdenada{
 
 private:
-
     // primer nodo de la lista
     NodoLista<T>* cabeza;
 
@@ -22,10 +21,8 @@ private:
     bool (*comparar)(T,T);
 
 public:
-
     // constructor
     ListaOrdenada(bool (*comparar)(T,T)){
-
         // al inicio la lista esta vacia
         cabeza = nullptr;
 
@@ -78,7 +75,6 @@ public:
 
     // recorrer lista
     void recorrer(void (*funcion)(T)){
-
         NodoLista<T>* actual = cabeza;
 
         while(actual != nullptr){
@@ -98,5 +94,77 @@ public:
         return cabeza == nullptr;
     }
 
+    // destructor
+    ~ListaOrdenada(){
+
+        NodoLista<T>* actual = cabeza;
+
+        while(actual != nullptr){
+
+            // guardamos nodo actual para liberarlo
+            NodoLista<T>* temp = actual;
+
+            // avanzar al siguiente nodo antes de borrar
+            actual = actual->siguiente;
+
+            // liberar nodo
+            delete temp;
+        }
+    }
+
+    // buscar elemento usando funcion de comparacion de igualdad
+    T buscar(bool (*compararIgual)(T,T), T clave){
+
+        NodoLista<T>* actual = cabeza;
+
+        while(actual != nullptr){
+
+            // si los elementos coinciden se devuelve el dato
+            if(compararIgual(actual->dato, clave)){
+                return actual->dato;
+            }
+
+            // avanzar al siguiente nodo
+            actual = actual->siguiente;
+        }
+
+        // si no se encontro devolvemos nullptr
+        return nullptr;
+    }
+
+    // eliminar elemento de la lista
+    bool eliminar(bool (*compararIgual)(T,T), T clave){
+
+        NodoLista<T>* actual = cabeza;
+        NodoLista<T>* anterior = nullptr;
+
+        while(actual != nullptr){
+
+            if(compararIgual(actual->dato, clave)){
+
+                // si el nodo a eliminar es la cabeza
+                if(anterior == nullptr){
+                    cabeza = actual->siguiente;
+                }
+                else{
+                    // saltamos el nodo actual
+                    anterior->siguiente = actual->siguiente;
+                }
+
+                // liberar memoria del nodo eliminado
+                delete actual;
+
+                tamanio--;
+                return true;
+            }
+
+            // avanzar en la lista
+            anterior = actual;
+            actual = actual->siguiente;
+        }
+
+        // si no se encontro el elemento
+        return false;
+    }
 };
 #endif //PROYECTO1_LISTA_ORDENADA_H

@@ -13,7 +13,6 @@ public:
     std::string categoria;
     std::string fecha_caducidad;
     std::string marca;
-
     double precio;
     int stock;
 
