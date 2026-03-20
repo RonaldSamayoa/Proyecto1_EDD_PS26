@@ -168,3 +168,46 @@ Producto* ArbolB::buscar(std::string fecha){
 
     return buscarRec(raiz, fecha);
 }
+
+// busca productos dentro de un rango de fechas
+ListaEnlazada<Producto*> ArbolB::buscarRango(std::string inicio, std::string fin){
+
+    ListaEnlazada<Producto*> resultado;
+
+    if(raiz != nullptr){
+        buscarRangoRec(raiz, inicio, fin, resultado);
+    }
+
+    return resultado;
+}
+
+// recorrido del arbol para encontrar elementos en rango
+void ArbolB::buscarRangoRec(NodoB* nodo, std::string inicio, std::string fin, ListaEnlazada<Producto*>& resultado){
+    int i;
+
+    // recorrer cada clave del nodo
+    for(i = 0; i < nodo->n; i++){
+
+        // si no es hoja, primero explorar hijo izquierdo
+        if(!nodo->hoja){
+            buscarRangoRec(nodo->hijos[i], inicio, fin, resultado);
+        }
+
+        std::string fecha = nodo->claves[i]->fecha_caducidad;
+
+        // si la fecha esta dentro del rango la agregamos
+        if(fecha >= inicio && fecha <= fin){
+            resultado.insertarFinal(nodo->claves[i]);
+        }
+
+        // si ya pasamos el rango, podemos cortar
+        if(fecha > fin){
+            return;
+        }
+    }
+
+    // procesar el ultimo hijo
+    if(!nodo->hoja){
+        buscarRangoRec(nodo->hijos[i], inicio, fin, resultado);
+    }
+}

@@ -5,6 +5,7 @@
 #ifndef PROYECTO1_ARBOL_B_H
 #define PROYECTO1_ARBOL_B_H
 #include "../producto.h"
+#include "lista_enlazada.h"
 
 // nodo del arbol B
 class NodoB{
@@ -45,6 +46,7 @@ private:
     void insertarNoLleno(NodoB* nodo, Producto* producto);
     void dividirHijo(NodoB* padre, int indice, NodoB* hijo);
     Producto* buscarRec(NodoB* nodo, std::string fecha);
+    void buscarRangoRec(NodoB* nodo, std::string inicio, std::string fin, ListaEnlazada<Producto*>& resultado);
 
 public:
     ArbolB(int t);
@@ -52,7 +54,7 @@ public:
     void insertar(Producto* producto);
 
     Producto* buscar(std::string fecha);
-
+    ListaEnlazada<Producto*> buscarRango(std::string inicio, std::string fin);
 };
 
 #endif //PROYECTO1_ARBOL_B_H
