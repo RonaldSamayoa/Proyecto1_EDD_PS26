@@ -35,7 +35,6 @@ void ArbolBPlus::insertar(Producto* producto){
 
         raiz = new NodoBPlus(t, true);
 
-        // primera clave
         raiz->claves[0] = producto->categoria;
 
         // crear lista para esa categoria
@@ -43,11 +42,39 @@ void ArbolBPlus::insertar(Producto* producto){
         raiz->datos[0]->insertarFinal(producto);
 
         raiz->n = 1;
-
         return;
     }
 
-    // buscar hoja donde insertar
+    // CASO ESPECIAL: si la raiz esta llena
+    if(raiz->n == 2*t - 1){
+
+        // solo manejamos cuando la raiz es hoja (por ahora)
+        if(raiz->hoja){
+
+            std::string nuevaClave;
+            NodoBPlus* nuevaHoja;
+
+            // dividir la raiz
+            dividirHoja(raiz, nuevaClave, nuevaHoja);
+
+            // crear nueva raiz (ahora es nodo interno)
+            NodoBPlus* nuevaRaiz = new NodoBPlus(t, false);
+
+            // la clave que sube al padre
+            nuevaRaiz->claves[0] = nuevaClave;
+
+            // enlazar hijos
+            nuevaRaiz->hijos[0] = raiz;
+            nuevaRaiz->hijos[1] = nuevaHoja;
+
+            nuevaRaiz->n = 1;
+
+            // actualizar raiz
+            raiz = nuevaRaiz;
+        }
+    }
+
+    // buscar hoja donde insertar (despues del posible split)
     NodoBPlus* hoja = buscarHoja(raiz, producto->categoria);
 
     // verificar si la categoria ya existe
@@ -55,16 +82,15 @@ void ArbolBPlus::insertar(Producto* producto){
 
         if(hoja->claves[i] == producto->categoria){
 
-            // ya existe -> solo agregamos a la lista
             hoja->datos[i]->insertarFinal(producto);
             return;
         }
     }
 
-    // si no existe, insertamos nueva clave (sin split aun)
+    // insertar nueva categoria en la hoja
     int i = hoja->n - 1;
 
-    // mover claves mayores hacia la derecha para mantener orden
+    // desplazar claves mayores para mantener orden
     while(i >= 0 && producto->categoria < hoja->claves[i]){
 
         hoja->claves[i + 1] = hoja->claves[i];
@@ -73,10 +99,10 @@ void ArbolBPlus::insertar(Producto* producto){
         i--;
     }
 
-    // insertar nueva categoria
+    // insertar clave
     hoja->claves[i + 1] = producto->categoria;
 
-    // crear nueva lista para esa categoria
+    // crear lista para la categoria
     hoja->datos[i + 1] = new ListaEnlazada<Producto*>();
     hoja->datos[i + 1]->insertarFinal(producto);
 
@@ -101,4 +127,32 @@ ListaEnlazada<Producto*>* ArbolBPlus::buscarCategoria(std::string categoria){
     }
 
     return nullptr; // no existe la categoria
+}
+
+// divide una hoja en dos cuando esta llena
+void ArbolBPlus::dividirHoja(NodoBPlus* hoja, std::string& nuevaClave, NodoBPlus*& nuevaHoja){
+
+    // crear nueva hoja
+    nuevaHoja = new NodoBPlus(t, true);
+
+    // punto medio de division
+    int mitad = t;
+
+    // copiar la mitad derecha a la nueva hoja
+    for(int i = mitad, j = 0; i < hoja->n; i++, j++){
+
+        nuevaHoja->claves[j] = hoja->claves[i];
+        nuevaHoja->datos[j] = hoja->datos[i];
+        nuevaHoja->n++;
+    }
+
+    // reducir tamaño de la hoja original
+    hoja->n = mitad;
+
+    // enlazar hojas (MUY IMPORTANTE en B+)
+    nuevaHoja->siguiente = hoja->siguiente;
+    hoja->siguiente = nuevaHoja;
+
+    // la clave que se sube es la primera de la nueva hoja
+    nuevaClave = nuevaHoja->claves[0];
 }

@@ -58,6 +58,8 @@ private:
     // buscar hoja donde pertenece una categoria
     NodoBPlus* buscarHoja(NodoBPlus* nodo, std::string categoria);
 
+    void dividirHoja(NodoBPlus* hoja, std::string& nuevaClave, NodoBPlus*& nuevaHoja);
+
 public:
     ArbolBPlus(int t);
 
