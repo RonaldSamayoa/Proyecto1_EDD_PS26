@@ -1,8 +1,71 @@
 //
 // Created by ronald on 11/3/26.
 //
-
 #ifndef PROYECTO1_ARBOL_BPLUS_H
 #define PROYECTO1_ARBOL_BPLUS_H
+#include "../producto.h"
+#include "lista_enlazada.h"
+#include <string>
+
+// nodo del arbol B+
+class NodoBPlus{
+
+public:
+    bool hoja; // indica si es hoja o nodo interno
+
+    std::string* claves; // categorias (ordenadas)
+    NodoBPlus** hijos;   // hijos (solo para nodos internos)
+
+    // en hojas: lista de productos por categoria
+    ListaEnlazada<Producto*>** datos;
+
+    int n; // cantidad actual de claves
+    int t; // grado minimo
+
+    NodoBPlus* siguiente; // enlace a la siguiente hoja (clave en B+)
+
+    // constructor
+    NodoBPlus(int t, bool hoja){
+        this->t = t;
+        this->hoja = hoja;
+
+        // maximo 2t - 1 claves
+        claves = new std::string[2*t - 1];
+
+        // maximo 2t hijos
+        hijos = new NodoBPlus*[2*t];
+
+        // solo se usa en hojas
+        datos = new ListaEnlazada<Producto*>*[2*t - 1];
+
+        n = 0;
+        siguiente = nullptr;
+    }
+};
+
+// ARBOL B+
+class ArbolBPlus{
+private:
+    NodoBPlus* raiz;
+    int t;
+
+    // insercion interna
+    void insertarNoLleno(NodoBPlus* nodo, Producto* producto);
+
+    // dividir nodo hijo
+    void dividirHijo(NodoBPlus* padre, int indice, NodoBPlus* hijo);
+
+    // buscar hoja donde pertenece una categoria
+    NodoBPlus* buscarHoja(NodoBPlus* nodo, std::string categoria);
+
+public:
+    ArbolBPlus(int t);
+
+    void insertar(Producto* producto);
+
+    // retorna todos los productos de una categoria
+    ListaEnlazada<Producto*>* buscarCategoria(std::string categoria);
+
+};
 
 #endif //PROYECTO1_ARBOL_BPLUS_H
