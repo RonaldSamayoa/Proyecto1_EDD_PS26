@@ -30,14 +30,12 @@ NodoBPlus* ArbolBPlus::buscarHoja(NodoBPlus* nodo, std::string categoria){
 // inserta un producto
 void ArbolBPlus::insertar(Producto* producto){
 
-    // si el arbol esta vacio se crea la raiz como hoja
+    // arbol vacio → crear raiz hoja
     if(raiz == nullptr){
 
         raiz = new NodoBPlus(t, true);
 
         raiz->claves[0] = producto->categoria;
-
-        // crear lista para esa categoria
         raiz->datos[0] = new ListaEnlazada<Producto*>();
         raiz->datos[0]->insertarFinal(producto);
 
@@ -45,68 +43,25 @@ void ArbolBPlus::insertar(Producto* producto){
         return;
     }
 
-    // CASO ESPECIAL: si la raiz esta llena
-    if(raiz->n == 2*t - 1){
+    std::string nuevaClave;       // clave que sube si hay split
+    NodoBPlus* nuevoNodo = nullptr; // nuevo nodo creado por split
 
-        // solo manejamos cuando la raiz es hoja (por ahora)
-        if(raiz->hoja){
+    // insercion recursiva
+    insertarNoLleno(raiz, producto, nuevaClave, nuevoNodo);
 
-            std::string nuevaClave;
-            NodoBPlus* nuevaHoja;
+    // si la raiz se dividio, crear nueva raiz
+    if(nuevoNodo != nullptr){
 
-            // dividir la raiz
-            dividirHoja(raiz, nuevaClave, nuevaHoja);
+        NodoBPlus* nuevaRaiz = new NodoBPlus(t, false);
 
-            // crear nueva raiz (ahora es nodo interno)
-            NodoBPlus* nuevaRaiz = new NodoBPlus(t, false);
+        nuevaRaiz->claves[0] = nuevaClave;
+        nuevaRaiz->hijos[0] = raiz;
+        nuevaRaiz->hijos[1] = nuevoNodo;
 
-            // la clave que sube al padre
-            nuevaRaiz->claves[0] = nuevaClave;
+        nuevaRaiz->n = 1;
 
-            // enlazar hijos
-            nuevaRaiz->hijos[0] = raiz;
-            nuevaRaiz->hijos[1] = nuevaHoja;
-
-            nuevaRaiz->n = 1;
-
-            // actualizar raiz
-            raiz = nuevaRaiz;
-        }
+        raiz = nuevaRaiz;
     }
-
-    // buscar hoja donde insertar (despues del posible split)
-    NodoBPlus* hoja = buscarHoja(raiz, producto->categoria);
-
-    // verificar si la categoria ya existe
-    for(int i = 0; i < hoja->n; i++){
-
-        if(hoja->claves[i] == producto->categoria){
-
-            hoja->datos[i]->insertarFinal(producto);
-            return;
-        }
-    }
-
-    // insertar nueva categoria en la hoja
-    int i = hoja->n - 1;
-
-    // desplazar claves mayores para mantener orden
-    while(i >= 0 && producto->categoria < hoja->claves[i]){
-
-        hoja->claves[i + 1] = hoja->claves[i];
-        hoja->datos[i + 1] = hoja->datos[i];
-
-        i--;
-    }
-
-    // insertar clave
-    hoja->claves[i + 1] = producto->categoria;
-
-    // crear lista para la categoria
-    hoja->datos[i + 1] = new ListaEnlazada<Producto*>();
-    hoja->datos[i + 1]->insertarFinal(producto);
-
-    hoja->n++;
 }
 
 // busca todos los productos de una categoria
@@ -140,19 +95,105 @@ void ArbolBPlus::dividirHoja(NodoBPlus* hoja, std::string& nuevaClave, NodoBPlus
 
     // copiar la mitad derecha a la nueva hoja
     for(int i = mitad, j = 0; i < hoja->n; i++, j++){
-
         nuevaHoja->claves[j] = hoja->claves[i];
         nuevaHoja->datos[j] = hoja->datos[i];
         nuevaHoja->n++;
     }
 
-    // reducir tamaño de la hoja original
+    // ajustar tamanio de la hoja original
     hoja->n = mitad;
 
-    // enlazar hojas (MUY IMPORTANTE en B+)
+    // enlazar hojas
     nuevaHoja->siguiente = hoja->siguiente;
     hoja->siguiente = nuevaHoja;
 
     // la clave que se sube es la primera de la nueva hoja
     nuevaClave = nuevaHoja->claves[0];
+}
+
+void ArbolBPlus::insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::string& nuevaClave, NodoBPlus*& nuevoNodo){
+
+    // CASO 1: nodo hoja
+    if(nodo->hoja){
+
+        // buscar si ya existe la categoria
+        for(int i = 0; i < nodo->n; i++){
+            if(nodo->claves[i] == producto->categoria){
+                nodo->datos[i]->insertarFinal(producto);
+                nuevoNodo = nullptr;
+                return;
+            }
+        }
+
+        // insertar normalmente
+        int i = nodo->n - 1;
+
+        while(i >= 0 && producto->categoria < nodo->claves[i]){
+            nodo->claves[i+1] = nodo->claves[i];
+            nodo->datos[i+1] = nodo->datos[i];
+            i--;
+        }
+
+        nodo->claves[i+1] = producto->categoria;
+        nodo->datos[i+1] = new ListaEnlazada<Producto*>();
+        nodo->datos[i+1]->insertarFinal(producto);
+
+        nodo->n++;
+
+        // si no hay desbordamiento terminamos
+        if(nodo->n < 2*t){
+            nuevoNodo = nullptr;
+            return;
+        }
+
+        // SPLIT DE HOJA
+        dividirHoja(nodo, nuevaClave, nuevoNodo);
+        return;
+    }
+
+    // CASO 2: nodo interno
+    int i = nodo->n - 1;
+
+    // buscar hijo adecuado
+    while(i >= 0 && producto->categoria < nodo->claves[i]){
+        i--;
+    }
+    i++;
+
+    std::string claveSube;
+    NodoBPlus* nuevoHijo = nullptr;
+
+    // insertar recursivamente en hijo
+    insertarNoLleno(nodo->hijos[i], producto, claveSube, nuevoHijo);
+
+    // si no hubo split en el hijo no hay nada que hacer
+    if(nuevoHijo == nullptr){
+        nuevoNodo = nullptr;
+        return;
+    }
+
+    // buscar posicion correcta para insertar la clave subida
+    int pos = i;
+
+    while(pos < nodo->n && nodo->claves[pos] < claveSube){
+        pos++;
+    }
+
+    // mover claves e hijos para abrir espacio
+    for(int j = nodo->n; j > pos; j--){
+        nodo->claves[j] = nodo->claves[j-1];
+        nodo->hijos[j+1] = nodo->hijos[j];
+    }
+
+    // insertar nueva clave y nuevo hijo
+    nodo->claves[pos] = claveSube;
+    nodo->hijos[pos+1] = nuevoHijo;
+
+    nodo->n++;
+
+    // si no hay desbordamiento
+    if(nodo->n < 2*t){
+        nuevoNodo = nullptr;
+        return;
+    }
 }

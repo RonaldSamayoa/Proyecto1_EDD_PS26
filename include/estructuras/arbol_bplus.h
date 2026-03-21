@@ -59,6 +59,7 @@ private:
     NodoBPlus* buscarHoja(NodoBPlus* nodo, std::string categoria);
 
     void dividirHoja(NodoBPlus* hoja, std::string& nuevaClave, NodoBPlus*& nuevaHoja);
+    void insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::string& nuevaClave, NodoBPlus*& nuevoNodo);
 
 public:
     ArbolBPlus(int t);
