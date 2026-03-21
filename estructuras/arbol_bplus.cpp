@@ -196,4 +196,39 @@ void ArbolBPlus::insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::strin
         nuevoNodo = nullptr;
         return;
     }
+
+    // si hay overflow en nodo interno
+    if(nodo->n >= 2*t){
+        dividirNodoInterno(nodo, nuevaClave, nuevoNodo);
+        return;
+    }
+}
+
+void ArbolBPlus::dividirNodoInterno(NodoBPlus* nodo, std::string& nuevaClave, NodoBPlus*& nuevoNodo){
+
+    // crear nuevo nodo interno (NO hoja)
+    nuevoNodo = new NodoBPlus(t, false);
+
+    int mitad = t; // punto de division
+
+    // la clave que sube al padre es la del medio
+    nuevaClave = nodo->claves[mitad];
+
+    // mover claves a la derecha (sin incluir la que sube)
+    int j = 0;
+    for(int i = mitad + 1; i < nodo->n; i++){
+        nuevoNodo->claves[j] = nodo->claves[i];
+        j++;
+    }
+
+    // mover hijos correspondientes
+    j = 0;
+    for(int i = mitad + 1; i <= nodo->n; i++){
+        nuevoNodo->hijos[j] = nodo->hijos[i];
+        j++;
+    }
+
+    // actualizar tamanios
+    nuevoNodo->n = nodo->n - mitad - 1;
+    nodo->n = mitad;
 }
