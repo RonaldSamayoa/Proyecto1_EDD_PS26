@@ -49,17 +49,12 @@ private:
     NodoBPlus* raiz;
     int t;
 
-    // insercion interna
-    void insertarNoLleno(NodoBPlus* nodo, Producto* producto);
-
-    // dividir nodo hijo
-    void dividirHijo(NodoBPlus* padre, int indice, NodoBPlus* hijo);
-
     // buscar hoja donde pertenece una categoria
     NodoBPlus* buscarHoja(NodoBPlus* nodo, std::string categoria);
 
     void dividirHoja(NodoBPlus* hoja, std::string& nuevaClave, NodoBPlus*& nuevaHoja);
-    void insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::string& nuevaClave, NodoBPlus*& nuevoNodo);
+    // insercion interna
+   void insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::string& nuevaClave, NodoBPlus*& nuevoNodo);
     void dividirNodoInterno(NodoBPlus* nodo, std::string& nuevaClave, NodoBPlus*& nuevoNodo);
 
 public:
@@ -70,6 +65,8 @@ public:
     // retorna todos los productos de una categoria
     ListaEnlazada<Producto*>* buscarCategoria(std::string categoria);
 
+    // recorre todas las categorias (hojas) en orden
+    void recorrerCategorias();
 };
 
 #endif //PROYECTO1_ARBOL_BPLUS_H

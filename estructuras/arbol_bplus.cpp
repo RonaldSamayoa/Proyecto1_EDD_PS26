@@ -2,6 +2,7 @@
 // Created by ronald on 11/3/26.
 //
 #include "../include/estructuras/arbol_bplus.h"
+#include <iostream>
 
 // constructor del arbol B+
 ArbolBPlus::ArbolBPlus(int t){
@@ -18,8 +19,8 @@ NodoBPlus* ArbolBPlus::buscarHoja(NodoBPlus* nodo, std::string categoria){
 
     int i = 0;
 
-    // encontrar el hijo adecuado segun la categoria
-    while(i < nodo->n && categoria > nodo->claves[i]){
+    // encontrar el hijo adecuado usando >= para ir al hijo derecho en caso de igualdad
+    while(i < nodo->n && categoria >= nodo->claves[i]){
         i++;
     }
 
@@ -67,21 +68,22 @@ void ArbolBPlus::insertar(Producto* producto){
 // busca todos los productos de una categoria
 ListaEnlazada<Producto*>* ArbolBPlus::buscarCategoria(std::string categoria){
 
+    // si el arbol esta vacio no hay nada que buscar
     if(raiz == nullptr)
         return nullptr;
 
-    // encontrar hoja donde deberia estar
+    // bajar hasta la hoja donde deberia estar la categoria
     NodoBPlus* hoja = buscarHoja(raiz, categoria);
 
-    // buscar dentro de la hoja
+    // recorrer claves de la hoja
     for(int i = 0; i < hoja->n; i++){
-
+        //si encontramos la categoria  devolvemos su lista
         if(hoja->claves[i] == categoria){
             return hoja->datos[i]; // devolvemos la lista completa
         }
     }
-
-    return nullptr; // no existe la categoria
+    // no existe la categoria
+    return nullptr;
 }
 
 // divide una hoja en dos cuando esta llena
@@ -197,7 +199,7 @@ void ArbolBPlus::insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::strin
         return;
     }
 
-    // si hay overflow en nodo interno
+    // si hay desbordamiento en nodo interno
     if(nodo->n >= 2*t){
         dividirNodoInterno(nodo, nuevaClave, nuevoNodo);
         return;
@@ -231,4 +233,38 @@ void ArbolBPlus::dividirNodoInterno(NodoBPlus* nodo, std::string& nuevaClave, No
     // actualizar tamanios
     nuevoNodo->n = nodo->n - mitad - 1;
     nodo->n = mitad;
+}
+
+// recorre todas las categorias del arbol B+ en orden y utiliza los punteros 'siguiente' para ir hoja por hoja
+void ArbolBPlus::recorrerCategorias(){
+
+    // si el arbol esta vacio no hay nada que mostrar
+    if(raiz == nullptr)
+        return;
+
+    NodoBPlus* actual = raiz;
+
+    // bajar hasta la hoja mas a la izquierda
+    while(!actual->hoja){
+        actual = actual->hijos[0];
+    }
+
+    // recorrer todas las hojas usando el puntero siguiente
+    while(actual != nullptr){
+
+        // recorrer todas las claves (categorias) de la hoja actual
+        for(int i = 0; i < actual->n; i++){
+
+            // imprimir nombre de categoria
+            std::cout << "Categoria: " << actual->claves[i] << std::endl;
+
+            // recorrer lista de productos de esa categoria
+            actual->datos[i]->recorrer([](Producto* p){
+                std::cout << "  - " << p->nombre << std::endl;
+            });
+        }
+
+        // avanzar a la siguiente hoja
+        actual = actual->siguiente;
+    }
 }
