@@ -2,6 +2,8 @@
 // Created by ronald on 11/3/26.
 //
 #include "../include/estructuras/arbol_avl.h"
+#include <iostream>
+
 // constructor del nodo AVL
 // inicializa los punteros de hijos en nullptr
 NodoAVL::NodoAVL(Producto* p){
@@ -270,6 +272,8 @@ void ArbolAVL::inorderRec(NodoAVL* nodo){
         return;
 
     inorderRec(nodo->izquierda);
+    // imprimir el nodo actual
+    std::cout << nodo->producto->nombre << std::endl;
     inorderRec(nodo->derecha);
 }
 
