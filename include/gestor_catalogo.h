@@ -11,6 +11,7 @@
 #include "estructuras/arbol_b.h"
 #include "estructuras/arbol_bplus.h"
 #include "estructuras/lista_enlazada.h"
+#include "estructuras/lista_ordenada.h"
 
 class GestorCatalogo {
 
@@ -21,6 +22,7 @@ private:
     ArbolB arbolB;                         // busqueda por fecha
     ArbolBPlus arbolBPlus;                 // busqueda por categoria
     ListaEnlazada<Producto*> lista;        // base de datos general
+    ListaOrdenada<Producto*>* listaOrdenada; // lista ordenada por nombre
 
 public:
 
@@ -35,6 +37,8 @@ public:
     Producto* buscarPorCodigo(std::string codigo);
     Producto* buscarPorFecha(std::string fecha);
     ListaEnlazada<Producto*>* buscarPorCategoria(std::string categoria);
+    void listarTodos();
+    void listarOrdenado();
 
     // eliminar
     void eliminarProducto(std::string nombre);
