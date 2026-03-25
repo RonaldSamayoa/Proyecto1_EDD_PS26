@@ -1,0 +1,6 @@
+nombre,codigo_barra,categoria,fecha_caducidad,marca,precio,stock
+Pan,001,Comida,2026-01-10,Bimbo,5.0,10
+Leche,002,Lacteos,2026-01-05,DosPinos,8.0,20
+Queso,003,Lacteos,2026-02-01,Sula,15.0,5
+Cafe,004,Bebidas,2026-03-01,Nescafe,12.0,8
+Galletas,005,Snacks,2026-04-01,Gamesa,7.5,15
