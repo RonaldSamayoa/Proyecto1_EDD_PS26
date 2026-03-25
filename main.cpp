@@ -7,6 +7,7 @@
 #include "include/estructuras/arbol_bplus.h"
 #include "include/estructuras/lista_enlazada.h"
 #include "include/estructuras/lista_ordenada.h"
+#include "include/gestor_catalogo.h"
 
 #include "include/producto.h"
 
@@ -112,6 +113,38 @@ int main(){
 
     bplus.recorrerCategorias();
 
+    std::cout << "\n===== GESTOR CATALOGO =====\n";
+
+    GestorCatalogo gestor(10, 3);
+
+    gestor.insertarProducto(p1);
+    gestor.insertarProducto(p2);
+    gestor.insertarProducto(p3);
+
+    // buscar por nombre
+    Producto* r1 = gestor.buscarPorNombre("Leche");
+    if(r1 != nullptr)
+        std::cout << "Nombre: " << r1->nombre << std::endl;
+
+    // buscar por codigo
+    Producto* r2 = gestor.buscarPorCodigo("003");
+    if(r2 != nullptr)
+        std::cout << "Codigo: " << r2->nombre << std::endl;
+
+    // buscar por fecha
+    Producto* r3 = gestor.buscarPorFecha("2026-01-10");
+    if(r3 != nullptr)
+        std::cout << "Fecha: " << r3->nombre << std::endl;
+
+    // buscar por categoria
+    auto listaCat = gestor.buscarPorCategoria("Lacteos");
+
+    if(listaCat != nullptr){
+        std::cout << "Categoria Lacteos:\n";
+        listaCat->recorrer([](Producto* p){
+            std::cout << "  - " << p->nombre << std::endl;
+        });
+    }
 
     // =====================================================
     //PRUEBA ELIMINACION AVL
