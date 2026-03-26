@@ -35,6 +35,9 @@ bool compararCodigo(Producto* a, Producto* b);
 // compara si dos productos tienen el mismo nombre
 bool compararNombre(Producto* a, Producto* b);
 
+//para ordenar
+bool compararNombreOrden(Producto* a, Producto* b);
+
 // compara categorias
 bool compararCategoria(Producto* a, Producto* b);
 

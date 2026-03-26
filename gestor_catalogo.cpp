@@ -8,7 +8,7 @@
 GestorCatalogo::GestorCatalogo(int capacidadHash, int gradoB)
     : hash(capacidadHash), arbolB(gradoB), arbolBPlus(gradoB) {
     //inicializar lista ordenada por nombre
-    listaOrdenada = new ListaOrdenada<Producto *>(compararNombre);
+    listaOrdenada = new ListaOrdenada<Producto *>(compararNombreOrden);
 }
 
 // insertar en todas las estructuras
@@ -51,8 +51,34 @@ ListaEnlazada<Producto*>* GestorCatalogo::buscarPorCategoria(std::string categor
 
 void GestorCatalogo::eliminarProducto(std::string nombre){
 
-    // eliminar del AVL (principal)
+    // buscar el producto en el AVL
+    Producto* producto = avl.buscar(nombre);
+
+    if(producto == nullptr){
+        std::cout << "Producto no encontrado\n";
+        return;
+    }
+
+    // eliminar de AVL
     avl.eliminar(nombre);
+
+    // eliminar de Hash (codigo)
+    hash.eliminar(producto->codigo_barra);
+
+    // eliminar de Arbol B (fecha)
+    arbolB.eliminar(producto->fecha_caducidad);
+
+    // eliminar de lista enlazada
+    lista.eliminar([](Producto* a, Producto* b){
+        return a->nombre == b->nombre;
+    }, producto);
+
+    // eliminar de lista ordenada
+    listaOrdenada->eliminar([](Producto* a, Producto* b){
+        return a->nombre == b->nombre;
+    }, producto);
+
+    std::cout << "Producto eliminado correctamente\n";
 }
 
 void imprimirProducto(Producto* p){

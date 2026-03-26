@@ -33,6 +33,10 @@ bool compararNombre(Producto* a, Producto* b){
     return a->nombre == b->nombre;
 }
 
+bool compararNombreOrden(Producto* a, Producto* b){
+    return a->nombre < b->nombre;
+}
+
 // compara categoria
 bool compararCategoria(Producto* a, Producto* b){
     return a->categoria == b->categoria;
