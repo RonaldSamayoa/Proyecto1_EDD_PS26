@@ -96,7 +96,6 @@ void ArbolB::insertarNoLleno(NodoB* nodo, Producto* producto){
 
 // divide un nodo hijo que esta lleno
 void ArbolB::dividirHijo(NodoB* padre, int indice, NodoB* hijo){
-
     // crear nuevo nodo que almacenara la mitad derecha
     NodoB* nuevo = new NodoB(t, hijo->hoja);
 
@@ -139,7 +138,6 @@ void ArbolB::dividirHijo(NodoB* padre, int indice, NodoB* hijo){
 
 // buscar producto por fecha
 Producto* ArbolB::buscarRec(NodoB* nodo, std::string fecha){
-
     int i = 0;
 
     // encontrar la primera clave >= fecha
@@ -160,7 +158,7 @@ Producto* ArbolB::buscarRec(NodoB* nodo, std::string fecha){
     return buscarRec(nodo->hijos[i], fecha);
 }
 
-// funcion publica
+// funcion publica de busqueda (por fecha)
 Producto* ArbolB::buscar(std::string fecha){
 
     if(raiz == nullptr)
@@ -171,13 +169,11 @@ Producto* ArbolB::buscar(std::string fecha){
 
 // busca productos dentro de un rango de fechas
 ListaEnlazada<Producto*> ArbolB::buscarRango(std::string inicio, std::string fin){
-
     ListaEnlazada<Producto*> resultado;
 
     if(raiz != nullptr){
         buscarRangoRec(raiz, inicio, fin, resultado);
     }
-
     return resultado;
 }
 
@@ -210,4 +206,260 @@ void ArbolB::buscarRangoRec(NodoB* nodo, std::string inicio, std::string fin, Li
     if(!nodo->hoja){
         buscarRangoRec(nodo->hijos[i], inicio, fin, resultado);
     }
+}
+
+void ArbolB::eliminar(std::string fecha){
+    if(raiz == nullptr)
+        return;
+
+    eliminarRec(raiz, fecha);
+
+    // si la raiz se queda sin claves
+    if(raiz->n == 0){
+        NodoB* temp = raiz;
+
+        // si era hoja, el arbol queda vacio
+        if(raiz->hoja){
+            raiz = nullptr;
+        }
+        else{
+            // si no, el primer hijo se convierte en nueva raiz
+            raiz = raiz->hijos[0];
+        }
+        delete temp;
+    }
+}
+
+int ArbolB::encontrarClave(NodoB* nodo, std::string fecha){
+    int idx = 0;
+
+    // buscamos la primera clave >= fecha
+    while(idx < nodo->n && nodo->claves[idx]->fecha_caducidad < fecha)
+        idx++;
+
+    return idx;
+}
+
+void ArbolB::eliminarRec(NodoB* nodo, std::string fecha){
+    int idx = encontrarClave(nodo, fecha);
+
+    // CASO 1: la clave está en este nodo
+    if(idx < nodo->n && nodo->claves[idx]->fecha_caducidad == fecha){
+
+        // si es hoja, eliminar directo
+        if(nodo->hoja)
+            eliminarDeHoja(nodo, idx);
+        else
+            eliminarDeInterno(nodo, idx);
+    }
+    else{
+        // si es hoja, no existe
+        if(nodo->hoja)
+            return;
+
+        bool ultimo = (idx == nodo->n);
+
+        // si el hijo tiene menos de t claves, arreglar antes de bajar
+        if(nodo->hijos[idx]->n < t)
+            llenar(nodo, idx);
+
+        // si hicimos merge puede cambiar la posición
+        if(ultimo && idx > nodo->n)
+            eliminarRec(nodo->hijos[idx - 1], fecha);
+        else
+            eliminarRec(nodo->hijos[idx], fecha);
+    }
+}
+
+void ArbolB::eliminarDeHoja(NodoB* nodo, int idx){
+    // mover todas las claves una posicion a la izquierda
+    for(int i = idx + 1; i < nodo->n; i++){
+        nodo->claves[i - 1] = nodo->claves[i];
+    }
+    nodo->n--;
+}
+
+void ArbolB::eliminarDeInterno(NodoB* nodo, int idx){
+    Producto* clave = nodo->claves[idx];
+
+    // CASO A: el hijo izquierdo tiene al menos t claves
+    if(nodo->hijos[idx]->n >= t){
+
+        // obtener el predecesor (mayor del subarbol izquierdo)
+        Producto* pred = obtenerPredecesor(nodo, idx);
+
+        // reemplazar la clave actual
+        nodo->claves[idx] = pred;
+
+        // eliminar recursivamente el predecesor
+        eliminarRec(nodo->hijos[idx], pred->fecha_caducidad);
+    }
+
+    // CASO B: el hijo derecho tiene al menos t claves
+    else if(nodo->hijos[idx + 1]->n >= t){
+
+        // obtener el sucesor (menor del subarbol derecho)
+        Producto* succ = obtenerSucesor(nodo, idx);
+
+        // reemplazar la clave
+        nodo->claves[idx] = succ;
+
+        // eliminar recursivamente el sucesor
+        eliminarRec(nodo->hijos[idx + 1], succ->fecha_caducidad);
+    }
+
+    // CASO C: ambos hijos tienen t-1 → hacer merge
+    else{
+
+        // fusionar hijo izquierdo, clave y hijo derecho
+        fusionar(nodo, idx);
+
+        // ahora la clave está en el hijo fusionado
+        eliminarRec(nodo->hijos[idx], clave->fecha_caducidad);
+    }
+}
+
+Producto* ArbolB::obtenerSucesor(NodoB* nodo, int idx){
+    NodoB* actual = nodo->hijos[idx + 1];
+
+    // ir siempre al hijo mas izquierdo
+    while(!actual->hoja){
+        actual = actual->hijos[0];
+    }
+
+    // la primera clave es el sucesor
+    return actual->claves[0];
+}
+
+Producto* ArbolB::obtenerPredecesor(NodoB* nodo, int idx){
+    NodoB* actual = nodo->hijos[idx];
+
+    // ir siempre al hijo mas derecho
+    while(!actual->hoja){
+        actual = actual->hijos[actual->n];
+    }
+
+    // la ultima clave es el predecesor
+    return actual->claves[actual->n - 1];
+}
+
+void ArbolB::llenar(NodoB* nodo, int idx){
+    // si el hermano izquierdo tiene suficientes claves
+    if(idx != 0 && nodo->hijos[idx - 1]->n >= t){
+        pedirPrestadoIzq(nodo, idx);
+    }
+
+    // si el hermano derecho tiene suficientes claves
+    else if(idx != nodo->n && nodo->hijos[idx + 1]->n >= t){
+        pedirPrestadoDer(nodo, idx);
+    }
+
+    // si ninguno puede prestar → fusionar
+    else{
+        // si es el ultimo hijo, fusionar con el izquierdo
+        if(idx != nodo->n)
+            fusionar(nodo, idx);
+        else
+            fusionar(nodo, idx - 1);
+    }
+}
+
+void ArbolB::pedirPrestadoIzq(NodoB* nodo, int idx){
+    NodoB* hijo = nodo->hijos[idx];
+    NodoB* hermano = nodo->hijos[idx - 1];
+
+    // mover claves del hijo hacia la derecha para abrir espacio
+    for(int i = hijo->n - 1; i >= 0; i--){
+        hijo->claves[i + 1] = hijo->claves[i];
+    }
+
+    // si no es hoja, mover tambien los hijos
+    if(!hijo->hoja){
+        for(int i = hijo->n; i >= 0; i--){
+            hijo->hijos[i + 1] = hijo->hijos[i];
+        }
+    }
+
+    // bajar la clave del padre al hijo
+    hijo->claves[0] = nodo->claves[idx - 1];
+
+    // si hay hijos, mover el ultimo hijo del hermano
+    if(!hijo->hoja){
+        hijo->hijos[0] = hermano->hijos[hermano->n];
+    }
+
+    // subir la ultima clave del hermano al padre
+    nodo->claves[idx - 1] = hermano->claves[hermano->n - 1];
+
+    hijo->n++;
+    hermano->n--;
+}
+
+void ArbolB::pedirPrestadoDer(NodoB* nodo, int idx){
+    NodoB* hijo = nodo->hijos[idx];
+    NodoB* hermano = nodo->hijos[idx + 1];
+
+    // bajar la clave del padre al hijo
+    hijo->claves[hijo->n] = nodo->claves[idx];
+
+    // si no es hoja, mover el primer hijo del hermano
+    if(!hijo->hoja){
+        hijo->hijos[hijo->n + 1] = hermano->hijos[0];
+    }
+
+    // subir la primera clave del hermano al padre
+    nodo->claves[idx] = hermano->claves[0];
+
+    // mover claves del hermano hacia la izquierda
+    for(int i = 1; i < hermano->n; i++){
+        hermano->claves[i - 1] = hermano->claves[i];
+    }
+
+    // mover hijos si no es hoja
+    if(!hermano->hoja){
+        for(int i = 1; i <= hermano->n; i++){
+            hermano->hijos[i - 1] = hermano->hijos[i];
+        }
+    }
+
+    hijo->n++;
+    hermano->n--;
+}
+
+//merge
+void ArbolB::fusionar(NodoB* nodo, int idx){
+    NodoB* hijo = nodo->hijos[idx];
+    NodoB* hermano = nodo->hijos[idx + 1];
+
+    // bajar la clave del padre al hijo (queda en medio)
+    hijo->claves[t - 1] = nodo->claves[idx];
+
+    // copiar claves del hermano al hijo
+    for(int i = 0; i < hermano->n; i++){
+        hijo->claves[i + t] = hermano->claves[i];
+    }
+
+    // copiar hijos si no es hoja
+    if(!hijo->hoja){
+        for(int i = 0; i <= hermano->n; i++){
+            hijo->hijos[i + t] = hermano->hijos[i];
+        }
+    }
+
+    // mover claves del padre hacia la izquierda
+    for(int i = idx + 1; i < nodo->n; i++){
+        nodo->claves[i - 1] = nodo->claves[i];
+    }
+
+    // mover hijos del padre
+    for(int i = idx + 2; i <= nodo->n; i++){
+        nodo->hijos[i - 1] = nodo->hijos[i];
+    }
+
+    // actualizar tamaños
+    hijo->n += hermano->n + 1;
+    nodo->n--;
+
+    // liberar memoria del hermano
+    delete hermano;
 }
