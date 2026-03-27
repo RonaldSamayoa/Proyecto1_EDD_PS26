@@ -271,50 +271,266 @@ void ArbolBPlus::recorrerCategorias(){
 
 // elimina un producto de una categoria en el arbol B+
 bool ArbolBPlus::eliminar(std::string categoria, std::string nombre){
-    // si el arbol esta vacio no hay nada que eliminar
     if(raiz == nullptr)
         return false;
 
-    // buscar la hoja donde deberia estar la categoria
-    NodoBPlus* hoja = buscarHoja(raiz, categoria);
+    bool eliminado = eliminarRec(raiz, categoria, nombre);
 
-    // recorrer claves de la hoja
-    for(int i = 0; i < hoja->n; i++){
+    // si la raiz queda vacia y no es hoja, bajar un nivel
+    if(raiz->n == 0 && !raiz->hoja){
+        raiz = raiz->hijos[0];
+    }
+    return eliminado;
+}
 
-        if(hoja->claves[i] == categoria){
+// elimina recursivamente en el arbol B+
+bool ArbolBPlus::eliminarRec(NodoBPlus* nodo, std::string categoria, std::string nombre){
+    // ===== CASO 1: nodo hoja =====
+    if(nodo->hoja){
+        // recorrer claves (categorias)
+        for(int i = 0; i < nodo->n; i++){
 
-            // funcion para comparar por nombre (igualdad)
-            auto comparar = [](Producto* a, Producto* b){
-                return a->nombre == b->nombre;
-            };
+            if(nodo->claves[i] == categoria){
 
-            // crear producto "dummy" solo con nombre para comparar
-            Producto dummy;
-            dummy.nombre = nombre;
+                // funcion de comparacion por nombre
+                auto comparar = [](Producto* a, Producto* b){
+                    return a->nombre == b->nombre;
+                };
 
-            // intentar eliminar de la lista
-            bool eliminado = hoja->datos[i]->eliminar(comparar, &dummy);
+                // producto temporal para comparar
+                Producto dummy;
+                dummy.nombre = nombre;
 
-            if(!eliminado)
-                return false; // no estaba en la lista
+                // eliminar de la lista
+                bool eliminado = nodo->datos[i]->eliminar(comparar, &dummy);
 
-            // si la lista queda vacia → eliminar la categoria completa
-            if(hoja->datos[i]->estaVacia()){
+                if(!eliminado)
+                    return false;
 
-                // liberar lista
-                delete hoja->datos[i];
+                // si la lista queda vacia eliminamos la categoria
+                if(nodo->datos[i]->estaVacia()){
 
-                // mover claves y listas hacia la izquierda
-                for(int j = i; j < hoja->n - 1; j++){
-                    hoja->claves[j] = hoja->claves[j+1];
-                    hoja->datos[j] = hoja->datos[j+1];
+                    delete nodo->datos[i];
+
+                    // mover claves y datos hacia la izquierda
+                    for(int j = i; j < nodo->n - 1; j++){
+                        nodo->claves[j] = nodo->claves[j+1];
+                        nodo->datos[j] = nodo->datos[j+1];
+                    }
+
+                    nodo->n--;
                 }
-                hoja->n--;
+
+                return true;
             }
-            return true;
+        }
+        // categoria no encontrada
+        return false;
+    }
+
+    // ===== CASO 2: nodo interno =====
+    int i = 0;
+
+    // buscar hijo donde podria estar la categoria
+    while(i < nodo->n && categoria >= nodo->claves[i]){
+        i++;
+    }
+
+    // bajar recursivamente
+    bool eliminado = eliminarRec(nodo->hijos[i], categoria, nombre);
+
+    if(!eliminado)
+        return false;
+
+    // ===== CONTROL DE SUBDESBORDAMIENTO =====
+    // verificar si el hijo tiene menos claves de las permitidas
+    if(nodo->hijos[i]->n < (t - 1)){
+
+        // arreglar el arbol
+        manejarSubdesbordamiento(nodo->hijos[i], nodo, i);
+    }
+
+    return true;
+}
+
+// maneja subdesbordamiento en un nodo
+void ArbolBPlus::manejarSubdesbordamiento(NodoBPlus* nodo, NodoBPlus* padre, int indice){
+
+    // ===== 1. INTENTAR CON HERMANO IZQUIERDO =====
+    if(indice > 0){
+
+        NodoBPlus* hermanoIzq = padre->hijos[indice - 1];
+
+        // si el hermano puede prestar
+        if(hermanoIzq->n >= t){
+
+            // ===== CASO HOJA =====
+            if(nodo->hoja){
+
+                // mover claves del nodo a la derecha para abrir espacio
+                for(int i = nodo->n; i > 0; i--){
+                    nodo->claves[i] = nodo->claves[i-1];
+                    nodo->datos[i] = nodo->datos[i-1];
+                }
+
+                // tomar la ultima clave del hermano izquierdo
+                nodo->claves[0] = hermanoIzq->claves[hermanoIzq->n - 1];
+                nodo->datos[0] = hermanoIzq->datos[hermanoIzq->n - 1];
+
+                nodo->n++;
+                hermanoIzq->n--;
+
+                // actualizar clave en el padre
+                padre->claves[indice - 1] = nodo->claves[0];
+            }
+
+            // ===== CASO NODO INTERNO =====
+            else{
+
+                // mover claves e hijos del nodo a la derecha
+                for(int i = nodo->n; i > 0; i--){
+                    nodo->claves[i] = nodo->claves[i-1];
+                    nodo->hijos[i+1] = nodo->hijos[i];
+                }
+
+                nodo->hijos[1] = nodo->hijos[0];
+
+                // bajar clave del padre
+                nodo->claves[0] = padre->claves[indice - 1];
+
+                // subir clave del hermano al padre
+                padre->claves[indice - 1] = hermanoIzq->claves[hermanoIzq->n - 1];
+
+                // mover hijo correspondiente
+                nodo->hijos[0] = hermanoIzq->hijos[hermanoIzq->n];
+
+                nodo->n++;
+                hermanoIzq->n--;
+            }
+
+            return; // ya resolvimos
         }
     }
 
-    // categoria no encontrada
-    return false;
+    // ===== 2. INTENTAR CON HERMANO DERECHO =====
+    if(indice < padre->n){
+        NodoBPlus* hermanoDer = padre->hijos[indice + 1];
+
+        // si puede prestar
+        if(hermanoDer->n >= t){
+
+            // ===== CASO HOJA =====
+            if(nodo->hoja){
+                // tomar la primera clave del hermano derecho
+                nodo->claves[nodo->n] = hermanoDer->claves[0];
+                nodo->datos[nodo->n] = hermanoDer->datos[0];
+
+                nodo->n++;
+
+                // mover claves del hermano a la izquierda
+                for(int i = 0; i < hermanoDer->n - 1; i++){
+                    hermanoDer->claves[i] = hermanoDer->claves[i+1];
+                    hermanoDer->datos[i] = hermanoDer->datos[i+1];
+                }
+
+                hermanoDer->n--;
+
+                // actualizar clave en el padre
+                padre->claves[indice] = hermanoDer->claves[0];
+            }
+
+            // ===== CASO NODO INTERNO =====
+            else{
+
+                // bajar clave del padre
+                nodo->claves[nodo->n] = padre->claves[indice];
+
+                // subir clave del hermano al padre
+                padre->claves[indice] = hermanoDer->claves[0];
+
+                // mover hijo correspondiente
+                nodo->hijos[nodo->n + 1] = hermanoDer->hijos[0];
+
+                nodo->n++;
+
+                // mover claves e hijos del hermano
+                for(int i = 0; i < hermanoDer->n - 1; i++){
+                    hermanoDer->claves[i] = hermanoDer->claves[i+1];
+                    hermanoDer->hijos[i] = hermanoDer->hijos[i+1];
+                }
+
+                hermanoDer->hijos[hermanoDer->n - 1] = hermanoDer->hijos[hermanoDer->n];
+                hermanoDer->n--;
+            }
+            return; // ya resolvimos
+        }
+    }
+
+    // ===== 3. SI NO SE PUEDE PRESTAR, FUSIONAR =====
+    // intentar fusion con hermano izquierdo
+    if(indice > 0){
+        NodoBPlus* hermanoIzq = padre->hijos[indice - 1];
+        fusionar(hermanoIzq, nodo, padre, indice - 1);
+    }
+    else{
+        // fusion con hermano derecho
+        NodoBPlus* hermanoDer = padre->hijos[indice + 1];
+
+        fusionar(nodo, hermanoDer, padre, indice);
+    }
+}
+
+// fusiona dos nodos en uno solo
+void ArbolBPlus::fusionar(NodoBPlus* nodo, NodoBPlus* hermano, NodoBPlus* padre, int indice){
+    // ===== CASO HOJA =====
+    if(nodo->hoja){
+
+        // copiar todas las claves y datos del hermano al nodo
+        for(int i = 0; i < hermano->n; i++){
+            nodo->claves[nodo->n + i] = hermano->claves[i];
+            nodo->datos[nodo->n + i] = hermano->datos[i];
+        }
+
+        nodo->n += hermano->n;
+
+        // ajustar lista enlazada de hojas
+        nodo->siguiente = hermano->siguiente;
+
+        // eliminar hermano
+        delete hermano;
+    }
+
+    // ===== CASO NODO INTERNO =====
+    else{
+        // bajar clave del padre al nodo
+        nodo->claves[nodo->n] = padre->claves[indice];
+
+        // copiar claves del hermano
+        for(int i = 0; i < hermano->n; i++){
+            nodo->claves[nodo->n + 1 + i] = hermano->claves[i];
+        }
+
+        // copiar hijos del hermano
+        for(int i = 0; i <= hermano->n; i++){
+            nodo->hijos[nodo->n + 1 + i] = hermano->hijos[i];
+        }
+
+        nodo->n += hermano->n + 1;
+
+        // eliminar hermano
+        delete hermano;
+    }
+
+    // ===== AJUSTAR PADRE =====
+    // mover claves del padre
+    for(int i = indice; i < padre->n - 1; i++){
+        padre->claves[i] = padre->claves[i + 1];
+    }
+
+    // mover hijos del padre
+    for(int i = indice + 1; i < padre->n; i++){
+        padre->hijos[i] = padre->hijos[i + 1];
+    }
+
+    padre->n--;
 }
