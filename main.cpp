@@ -87,8 +87,7 @@ int main(){
     std::cout << "\n===== LISTA ORDENADA DESPUES =====\n";
     gestor.listarOrdenado();
 
-    // =====================================================
-    // NOTA IMPORTANTE B+
+    // B+
     // =====================================================
     std::cout << "\n===== CATEGORIA DESPUES (B+) =====\n";
 

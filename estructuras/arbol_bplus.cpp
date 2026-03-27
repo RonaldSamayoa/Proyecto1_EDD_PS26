@@ -268,3 +268,53 @@ void ArbolBPlus::recorrerCategorias(){
         actual = actual->siguiente;
     }
 }
+
+// elimina un producto de una categoria en el arbol B+
+bool ArbolBPlus::eliminar(std::string categoria, std::string nombre){
+    // si el arbol esta vacio no hay nada que eliminar
+    if(raiz == nullptr)
+        return false;
+
+    // buscar la hoja donde deberia estar la categoria
+    NodoBPlus* hoja = buscarHoja(raiz, categoria);
+
+    // recorrer claves de la hoja
+    for(int i = 0; i < hoja->n; i++){
+
+        if(hoja->claves[i] == categoria){
+
+            // funcion para comparar por nombre (igualdad)
+            auto comparar = [](Producto* a, Producto* b){
+                return a->nombre == b->nombre;
+            };
+
+            // crear producto "dummy" solo con nombre para comparar
+            Producto dummy;
+            dummy.nombre = nombre;
+
+            // intentar eliminar de la lista
+            bool eliminado = hoja->datos[i]->eliminar(comparar, &dummy);
+
+            if(!eliminado)
+                return false; // no estaba en la lista
+
+            // si la lista queda vacia → eliminar la categoria completa
+            if(hoja->datos[i]->estaVacia()){
+
+                // liberar lista
+                delete hoja->datos[i];
+
+                // mover claves y listas hacia la izquierda
+                for(int j = i; j < hoja->n - 1; j++){
+                    hoja->claves[j] = hoja->claves[j+1];
+                    hoja->datos[j] = hoja->datos[j+1];
+                }
+                hoja->n--;
+            }
+            return true;
+        }
+    }
+
+    // categoria no encontrada
+    return false;
+}

@@ -67,6 +67,9 @@ public:
 
     // recorre todas las categorias (hojas) en orden
     void recorrerCategorias();
+
+    // eliminar producto por categoria y nombre
+    bool eliminar(std::string categoria, std::string nombre);
 };
 
 #endif //PROYECTO1_ARBOL_BPLUS_H

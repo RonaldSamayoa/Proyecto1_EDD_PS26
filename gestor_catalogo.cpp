@@ -68,6 +68,8 @@ void GestorCatalogo::eliminarProducto(std::string nombre){
     // eliminar de Arbol B (fecha)
     arbolB.eliminar(producto->fecha_caducidad);
 
+    arbolBPlus.eliminar(producto->categoria, nombre);
+
     // eliminar de lista enlazada
     lista.eliminar([](Producto* a, Producto* b){
         return a->nombre == b->nombre;
