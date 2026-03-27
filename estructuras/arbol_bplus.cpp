@@ -342,14 +342,11 @@ bool ArbolBPlus::eliminarRec(NodoBPlus* nodo, std::string categoria, std::string
     if(!eliminado)
         return false;
 
-    // ===== CONTROL DE SUBDESBORDAMIENTO =====
     // verificar si el hijo tiene menos claves de las permitidas
     if(nodo->hijos[i]->n < (t - 1)){
-
         // arreglar el arbol
         manejarSubdesbordamiento(nodo->hijos[i], nodo, i);
     }
-
     return true;
 }
 
@@ -358,7 +355,6 @@ void ArbolBPlus::manejarSubdesbordamiento(NodoBPlus* nodo, NodoBPlus* padre, int
 
     // ===== 1. INTENTAR CON HERMANO IZQUIERDO =====
     if(indice > 0){
-
         NodoBPlus* hermanoIzq = padre->hijos[indice - 1];
 
         // si el hermano puede prestar
@@ -366,7 +362,6 @@ void ArbolBPlus::manejarSubdesbordamiento(NodoBPlus* nodo, NodoBPlus* padre, int
 
             // ===== CASO HOJA =====
             if(nodo->hoja){
-
                 // mover claves del nodo a la derecha para abrir espacio
                 for(int i = nodo->n; i > 0; i--){
                     nodo->claves[i] = nodo->claves[i-1];
@@ -407,7 +402,6 @@ void ArbolBPlus::manejarSubdesbordamiento(NodoBPlus* nodo, NodoBPlus* padre, int
                 nodo->n++;
                 hermanoIzq->n--;
             }
-
             return; // ya resolvimos
         }
     }
@@ -441,13 +435,11 @@ void ArbolBPlus::manejarSubdesbordamiento(NodoBPlus* nodo, NodoBPlus* padre, int
 
             // ===== CASO NODO INTERNO =====
             else{
-
                 // bajar clave del padre
                 nodo->claves[nodo->n] = padre->claves[indice];
 
                 // subir clave del hermano al padre
                 padre->claves[indice] = hermanoDer->claves[0];
-
                 // mover hijo correspondiente
                 nodo->hijos[nodo->n + 1] = hermanoDer->hijos[0];
 
@@ -458,7 +450,6 @@ void ArbolBPlus::manejarSubdesbordamiento(NodoBPlus* nodo, NodoBPlus* padre, int
                     hermanoDer->claves[i] = hermanoDer->claves[i+1];
                     hermanoDer->hijos[i] = hermanoDer->hijos[i+1];
                 }
-
                 hermanoDer->hijos[hermanoDer->n - 1] = hermanoDer->hijos[hermanoDer->n];
                 hermanoDer->n--;
             }
@@ -475,7 +466,6 @@ void ArbolBPlus::manejarSubdesbordamiento(NodoBPlus* nodo, NodoBPlus* padre, int
     else{
         // fusion con hermano derecho
         NodoBPlus* hermanoDer = padre->hijos[indice + 1];
-
         fusionar(nodo, hermanoDer, padre, indice);
     }
 }
@@ -516,7 +506,6 @@ void ArbolBPlus::fusionar(NodoBPlus* nodo, NodoBPlus* hermano, NodoBPlus* padre,
         }
 
         nodo->n += hermano->n + 1;
-
         // eliminar hermano
         delete hermano;
     }
@@ -531,6 +520,5 @@ void ArbolBPlus::fusionar(NodoBPlus* nodo, NodoBPlus* hermano, NodoBPlus* padre,
     for(int i = indice + 1; i < padre->n; i++){
         padre->hijos[i] = padre->hijos[i + 1];
     }
-
     padre->n--;
 }

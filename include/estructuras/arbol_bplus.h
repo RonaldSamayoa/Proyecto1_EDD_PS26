@@ -59,13 +59,11 @@ private:
     // eliminacion completa (recursiva)
     bool eliminarRec(NodoBPlus* nodo, std::string categoria, std::string nombre);
 
-    // manejo de desbalance (cuando un nodo queda con pocas claves)
-    void manejarUnderflow(NodoBPlus* nodo, NodoBPlus* padre, int indice);
-
     // fusion de nodos
     void fusionar(NodoBPlus* nodo, NodoBPlus* hermano, NodoBPlus* padre, int indice);
 
     void manejarSubdesbordamiento(NodoBPlus* nodo, NodoBPlus* padre, int indice);
+
 public:
     ArbolBPlus(int t);
 
