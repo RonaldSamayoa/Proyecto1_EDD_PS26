@@ -4,6 +4,7 @@
 
 #include "menu.h"
 #include <iostream>
+#include "include/utilidades/lector_csv.h"
 
 Menu::Menu(GestorCatalogo& g) : gestor(g) {}
 
@@ -17,18 +18,42 @@ void Menu::iniciar(){
         std::cin >> opcion;
 
         switch(opcion){
-            case 1: opcionInsertar(); break;
-            case 2: opcionBuscarNombre(); break;
-            case 3: opcionBuscarCodigo(); break;
-            case 4: opcionBuscarCategoria(); break;
-            case 5: opcionBuscarRango(); break;
-            case 6: opcionEliminar(); break;
-            case 7: opcionListar(); break;
-            case 8: opcionListarOrdenado(); break;
-            case 9: opcionComparar(); break;
-            case 10: opcionCSV(); break;
-            case 11: opcionDOT(); break;
-            case 0: std::cout << "Saliendo...\n"; break;
+            case 1:
+                opcionInsertar();
+                break;
+            case 2:
+                opcionBuscarNombre();
+                break;
+            case 3:
+                opcionBuscarCodigo();
+                break;
+            case 4:
+                opcionBuscarCategoria();
+                break;
+            case 5:
+                opcionBuscarRango();
+                break;
+            case 6:
+                opcionEliminar();
+                break;
+            case 7:
+                opcionListar();
+                break;
+            case 8:
+                opcionListarOrdenado();
+                break;
+            case 9:
+                opcionComparar();
+                break;
+            case 10:
+                cargarDesdeCSV(gestor);
+                break;
+            case 11:
+                opcionDOT();
+                break;
+            case 0:
+                std::cout << "Saliendo...\n";
+                break;
             default: std::cout << "Opcion invalida\n";
         }
 
@@ -158,10 +183,33 @@ void Menu::opcionComparar(){
     std::cout << "Funcion aun no implementada\n";
 }
 
-void Menu::opcionCSV(){
+void Menu::opcionDOT(){
     std::cout << "Funcion aun no implementada\n";
 }
 
-void Menu::opcionDOT(){
-    std::cout << "Funcion aun no implementada\n";
+void Menu::cargarDesdeCSV(GestorCatalogo& gestor){
+
+    std::string ruta = "../datos/productos.csv";
+
+    std::vector<Producto*> productos = LectorCSV::leerArchivo(ruta);
+
+    if(productos.empty()){
+        std::cout << "No se cargaron productos\n";
+        return;
+    }
+
+    int insertados = 0;
+
+    for(auto p : productos){
+        //validar duplicados por codigo
+        if(gestor.buscarPorCodigo(p->codigo_barra) != nullptr){
+            std::cout << "Codigo duplicado ignorado: " << p->codigo_barra << "\n";
+            continue;
+        }
+
+        gestor.insertarProducto(p);
+        insertados++;
+    }
+
+    std::cout << "Productos insertados: " << insertados << std::endl;
 }

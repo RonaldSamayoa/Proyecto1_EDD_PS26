@@ -34,7 +34,7 @@ private:
     void opcionListarOrdenado();
 
     void opcionComparar(); // pendiente
-    void opcionCSV();      // pendiente
+    void cargarDesdeCSV(GestorCatalogo& gestor);
     void opcionDOT();      // pendiente
 };
 
