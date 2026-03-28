@@ -27,4 +27,6 @@ add_executable(Proyecto1 main.cpp
         include/utilidades/temporizador.h
         include/utilidades/generador_dot.h
         include/utilidades/logger.h
-        producto.cpp)
+        producto.cpp
+        menu.cpp
+        menu.h)
