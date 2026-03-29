@@ -38,6 +38,8 @@ public:
     Producto* buscarPorFecha(std::string fecha);
     ListaEnlazada<Producto*>* buscarPorCategoria(std::string categoria);
     ListaEnlazada<Producto*> buscarPorRango(std::string inicio, std::string fin);
+    // comparacion de busqueda (lista vs AVL)
+    void compararBusqueda(std::string nombre);
     void listarTodos();
     void listarOrdenado();
 

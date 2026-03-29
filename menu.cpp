@@ -72,7 +72,7 @@ void Menu::mostrarMenu(){
     std::cout << "6. Eliminar producto\n";
     std::cout << "7. Listar productos\n";
     std::cout << "8. Listar productos ordenados\n";
-    std::cout << "9. Comparar busquedas\n";
+    std::cout << "9. Comparar busquedas (Lista vs AVL)\n";
     std::cout << "10. Cargar desde CSV\n";
     std::cout << "11. Visualizar arboles (.dot)\n";
     std::cout << "0. Salir\n";
@@ -198,7 +198,11 @@ void Menu::opcionBuscarRangoFecha(){
 
 // ===== PENDIENTES =====
 void Menu::opcionComparar(){
-    std::cout << "Funcion aun no implementada\n";
+    std::string nombre;
+    std::cout << "Nombre a buscar: ";
+    std::cin >> nombre;
+
+    gestor.compararBusqueda(nombre);
 }
 
 void Menu::opcionDOT(){

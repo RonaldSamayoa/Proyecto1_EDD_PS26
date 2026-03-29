@@ -3,6 +3,7 @@
 //
 #include "include/gestor_catalogo.h"
 #include <iostream>
+#include "include/utilidades/temporizador.h"
 
 // constructor
 GestorCatalogo::GestorCatalogo(int capacidadHash, int gradoB)
@@ -51,8 +52,61 @@ ListaEnlazada<Producto*> GestorCatalogo::buscarPorRango(std::string inicio, std:
     return arbolB.buscarRango(inicio, fin);
 }
 
-// ===== ELIMINACION =====
+// compara tiempos de busqueda entre lista y AVL
+void GestorCatalogo::compararBusqueda(std::string nombre){
+    Temporizador tLista, tAVL;
 
+    Producto* encontradoLista = nullptr;
+    Producto* encontradoAVL = nullptr;
+
+    // numero de veces que se repite la busqueda
+    // esto se hace porque una sola busqueda es demasiado rapida
+    // y puede dar tiempo 0, entonces repetimos muchas veces
+    // para obtener un tiempo medible y comparable
+    int repeticiones = 10000;
+
+    // ===== BUSQUEDA EN LISTA =====
+    tLista.iniciar();
+    // repetimos la busqueda muchas veces
+    for(int i = 0; i < repeticiones; i++){
+        NodoLista<Producto*>* actual = lista.obtenerCabeza();
+
+        while(actual != nullptr){
+
+            if(actual->dato->nombre == nombre){
+                encontradoLista = actual->dato;
+                break;
+            }
+            actual = actual->siguiente;
+        }
+    }
+    tLista.detener();
+
+    // ===== BUSQUEDA EN AVL =====
+    tAVL.iniciar();
+    // igual, repetimos muchas veces
+    for(int i = 0; i < repeticiones; i++){
+        encontradoAVL = avl.buscar(nombre);
+    }
+
+    tAVL.detener();
+
+    // ===== RESULTADOS =====
+    std::cout << "\n===== RESULTADOS =====\n";
+
+    std::cout << "Lista (tiempo en milisegundos): "
+              << tLista.obtenerMilisegundos() << std::endl;
+
+    std::cout << "AVL (tiempo en milisegundos): "
+              << tAVL.obtenerMilisegundos() << std::endl;
+
+    if(encontradoAVL)
+        std::cout << "Producto encontrado: " << encontradoAVL->nombre << std::endl;
+    else
+        std::cout << "Producto no encontrado\n";
+}
+
+// ===== ELIMINACION =====
 void GestorCatalogo::eliminarProducto(std::string nombre){
 
     // buscar el producto en el AVL
