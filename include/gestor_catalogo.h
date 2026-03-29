@@ -37,6 +37,7 @@ public:
     Producto* buscarPorCodigo(std::string codigo);
     Producto* buscarPorFecha(std::string fecha);
     ListaEnlazada<Producto*>* buscarPorCategoria(std::string categoria);
+    ListaEnlazada<Producto*> buscarPorRango(std::string inicio, std::string fin);
     void listarTodos();
     void listarOrdenado();
 

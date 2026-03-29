@@ -47,6 +47,10 @@ ListaEnlazada<Producto*>* GestorCatalogo::buscarPorCategoria(std::string categor
     return arbolBPlus.buscarCategoria(categoria);
 }
 
+ListaEnlazada<Producto*> GestorCatalogo::buscarPorRango(std::string inicio, std::string fin){
+    return arbolB.buscarRango(inicio, fin);
+}
+
 // ===== ELIMINACION =====
 
 void GestorCatalogo::eliminarProducto(std::string nombre){
@@ -88,7 +92,6 @@ void imprimirProducto(Producto* p){
 }
 
 void GestorCatalogo::listarTodos(){
-
     // recorre la lista base (orden de insercion)
     lista.recorrer(imprimirProducto);
 }

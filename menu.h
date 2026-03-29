@@ -26,7 +26,7 @@ private:
     void opcionBuscarNombre();
     void opcionBuscarCodigo();
     void opcionBuscarCategoria();
-    void opcionBuscarRango(); // pendiente
+    void opcionBuscarRangoFecha();
 
     void opcionEliminar();
 

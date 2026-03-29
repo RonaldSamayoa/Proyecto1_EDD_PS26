@@ -31,7 +31,7 @@ void Menu::iniciar(){
                 opcionBuscarCategoria();
                 break;
             case 5:
-                opcionBuscarRango();
+                opcionBuscarRangoFecha();
                 break;
             case 6:
                 opcionEliminar();
@@ -173,12 +173,30 @@ void Menu::opcionListarOrdenado(){
     gestor.listarOrdenado();
 }
 
-// ===== PENDIENTES =====
+//buscar por fechas de caducidad
+void Menu::opcionBuscarRangoFecha(){
+    std::string inicio, fin;
 
-void Menu::opcionBuscarRango(){
-    std::cout << "Funcion aun no implementada\n";
+    std::cout << "Fecha inicio (YYYY-MM-DD): ";
+    std::cin >> inicio;
+
+    std::cout << "Fecha fin (YYYY-MM-DD): ";
+    std::cin >> fin;
+
+    auto resultado = gestor.buscarPorRango(inicio, fin);
+
+    if(resultado.estaVacia()){
+        std::cout << "No se encontraron productos en ese rango\n";
+        return;
+    }
+
+    resultado.recorrer([](Producto* p){
+        std::cout << " - " << p->nombre
+                  << " (" << p->fecha_caducidad << ")\n";
+    });
 }
 
+// ===== PENDIENTES =====
 void Menu::opcionComparar(){
     std::cout << "Funcion aun no implementada\n";
 }
