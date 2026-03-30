@@ -33,9 +33,9 @@ private:
     void opcionListar();
     void opcionListarOrdenado();
 
-    void opcionComparar(); // pendiente
+    void opcionComparar();
     void cargarDesdeCSV(GestorCatalogo& gestor);
-    void opcionDOT();      // pendiente
+    void opcionDOT();
 };
 
 #endif //PROYECTO1_MENU_H

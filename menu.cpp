@@ -1,17 +1,14 @@
 //
 // Created by ronald on 28/3/26.
 //
-
 #include "menu.h"
 #include <iostream>
 #include "include/utilidades/lector_csv.h"
 #include "include/utilidades/generador_dot.h"
 
 Menu::Menu(GestorCatalogo& g) : gestor(g) {}
-
 // bucle principal
 void Menu::iniciar(){
-
     int opcion;
 
     do{
@@ -57,13 +54,11 @@ void Menu::iniciar(){
                 break;
             default: std::cout << "Opcion invalida\n";
         }
-
     }while(opcion != 0);
 }
 
 // mostrar opciones
 void Menu::mostrarMenu(){
-
     std::cout << "\n===== MENU =====\n";
     std::cout << "1. Agregar producto\n";
     std::cout << "2. Buscar por nombre\n";
@@ -83,7 +78,6 @@ void Menu::mostrarMenu(){
 // ===== IMPLEMENTADAS =====
 
 void Menu::opcionInsertar(){
-
     Producto* p = new Producto();
 
     std::cout << "Nombre: ";
@@ -113,7 +107,6 @@ void Menu::opcionInsertar(){
 }
 
 void Menu::opcionBuscarNombre(){
-
     std::string nombre;
     std::cout << "Nombre: ";
     std::cin >> nombre;
@@ -127,7 +120,6 @@ void Menu::opcionBuscarNombre(){
 }
 
 void Menu::opcionBuscarCodigo(){
-
     std::string codigo;
     std::cout << "Codigo: ";
     std::cin >> codigo;
@@ -141,7 +133,6 @@ void Menu::opcionBuscarCodigo(){
 }
 
 void Menu::opcionBuscarCategoria(){
-
     std::string categoria;
     std::cout << "Categoria: ";
     std::cin >> categoria;
@@ -158,7 +149,6 @@ void Menu::opcionBuscarCategoria(){
 }
 
 void Menu::opcionEliminar(){
-
     std::string nombre;
     std::cout << "Nombre a eliminar: ";
     std::cin >> nombre;
@@ -206,15 +196,21 @@ void Menu::opcionComparar(){
 }
 
 void Menu::opcionDOT(){
+    // ===== AVL =====
+    std::string rutaAVL = "../output/avl.dot";
+    GeneradorDOT::generarAVL(gestor.obtenerAVL(), rutaAVL);
 
-    std::string ruta = "../output/avl.dot";
-
-    GeneradorDOT::generarAVL(gestor.obtenerAVL(), ruta);
-
-    std::cout << "Archivo generado en: " << ruta << std::endl;
-    std::cout << "Para visualizar:\n";
-    std::cout << "dot -Tpng ../output/avl.dot -o ../output/avl.png\n";
+    std::cout << "AVL generado en: " << rutaAVL << std::endl;
     system("dot -Tpng ../output/avl.dot -o ../output/avl.png");
+
+    // ===== ARBOL B =====
+    std::string rutaB = "../output/arbol_b.dot";
+
+    GeneradorDOT::generarB(gestor.obtenerArbolB(), rutaB);
+    std::cout << "Arbol B generado en: " << rutaB << std::endl;
+
+    system("dot -Tpng ../output/arbol_b.dot -o ../output/arbol_b.png");
+    std::cout << "\nImagenes generadas en carpeta /output\n";
 }
 
 void Menu::cargarDesdeCSV(GestorCatalogo& gestor){

@@ -41,6 +41,7 @@ public:
     // comparacion de busqueda (lista vs AVL)
     void compararBusqueda(std::string nombre);
     ArbolAVL& obtenerAVL();
+    ArbolB& obtenerArbolB();
     void listarTodos();
     void listarOrdenado();
 

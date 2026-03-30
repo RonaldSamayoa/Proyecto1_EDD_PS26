@@ -157,3 +157,7 @@ void GestorCatalogo::listarOrdenado(){
 ArbolAVL& GestorCatalogo::obtenerAVL(){
     return avl;
 }
+
+ArbolB& GestorCatalogo::obtenerArbolB(){
+    return arbolB;
+}

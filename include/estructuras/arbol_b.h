@@ -71,6 +71,7 @@ public:
     Producto* buscar(std::string fecha);
     ListaEnlazada<Producto*> buscarRango(std::string inicio, std::string fin);
     void eliminar(std::string fecha);
+    NodoB* obtenerRaiz();
 };
 
 #endif //PROYECTO1_ARBOL_B_H

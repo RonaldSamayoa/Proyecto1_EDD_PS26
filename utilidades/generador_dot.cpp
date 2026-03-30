@@ -56,3 +56,63 @@ void GeneradorDOT::generarAVL(ArbolAVL& arbol, std::string nombreArchivo){
 
     archivo.close();
 }
+
+// funcion auxiliar para recorrer el arbol B
+void recorrerB(std::ofstream& archivo, NodoB* nodo){
+    // caso base
+    if(nodo == nullptr)
+        return;
+
+    // ===== CREAR ETIQUETA DEL NODO =====
+    // un nodo B puede tener varias claves, las mostramos separadas por |
+    std::string label = "";
+
+    for(int i = 0; i < nodo->n; i++){
+
+        // usamos la fecha como identificador visual
+        label += nodo->claves[i]->fecha_caducidad;
+
+        if(i < nodo->n - 1)
+            label += " | ";
+    }
+
+    // escribir nodo en DOT
+    archivo << "\"" << nodo << "\" [label=\"" << label << "\"];\n";
+
+    // ===== RECORRER HIJOS =====
+    if(!nodo->hoja){
+
+        for(int i = 0; i <= nodo->n; i++){
+
+            if(nodo->hijos[i] != nullptr){
+
+                // crear conexion padre -> hijo
+                archivo << "\"" << nodo << "\" -> \"" << nodo->hijos[i] << "\";\n";
+
+                // llamada recursiva
+                recorrerB(archivo, nodo->hijos[i]);
+            }
+        }
+    }
+}
+
+// genera archivo .dot del arbol B
+void GeneradorDOT::generarB(ArbolB& arbol, std::string nombreArchivo){
+    std::ofstream archivo(nombreArchivo);
+
+    if(!archivo.is_open()){
+        return;
+    }
+
+    archivo << "digraph BTree {\n";
+    archivo << "node [shape=record];\n";
+
+    // obtener raiz
+    NodoB* raiz = arbol.obtenerRaiz();
+
+    // recorrer todo el arbol
+    recorrerB(archivo, raiz);
+
+    archivo << "}\n";
+    archivo.close();
+}

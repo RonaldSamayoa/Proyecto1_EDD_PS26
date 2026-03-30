@@ -463,3 +463,7 @@ void ArbolB::fusionar(NodoB* nodo, int idx){
     // liberar memoria del hermano
     delete hermano;
 }
+
+NodoB* ArbolB::obtenerRaiz() {
+    return raiz;
+}
