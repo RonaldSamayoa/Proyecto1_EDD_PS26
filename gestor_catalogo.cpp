@@ -153,3 +153,7 @@ void GestorCatalogo::listarTodos(){
 void GestorCatalogo::listarOrdenado(){
     listaOrdenada->recorrer(imprimirProducto);
 }
+
+ArbolAVL& GestorCatalogo::obtenerAVL(){
+    return avl;
+}

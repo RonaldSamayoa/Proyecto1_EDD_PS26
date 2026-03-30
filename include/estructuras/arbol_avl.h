@@ -42,7 +42,6 @@ private:
     void inorderRec(NodoAVL* nodo);
 
 public:
-
     ArbolAVL();
 
     void insertar(Producto* producto);
@@ -52,5 +51,7 @@ public:
     Producto* buscar(std::string nombre);
 
     void inorder();
+
+    NodoAVL* obtenerRaiz();
 };
 #endif //PROYECTO1_ARBOL_AVL_H

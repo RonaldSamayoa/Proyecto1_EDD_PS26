@@ -40,6 +40,7 @@ public:
     ListaEnlazada<Producto*> buscarPorRango(std::string inicio, std::string fin);
     // comparacion de busqueda (lista vs AVL)
     void compararBusqueda(std::string nombre);
+    ArbolAVL& obtenerAVL();
     void listarTodos();
     void listarOrdenado();
 

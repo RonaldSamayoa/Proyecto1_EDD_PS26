@@ -5,6 +5,7 @@
 #include "menu.h"
 #include <iostream>
 #include "include/utilidades/lector_csv.h"
+#include "include/utilidades/generador_dot.h"
 
 Menu::Menu(GestorCatalogo& g) : gestor(g) {}
 
@@ -196,7 +197,6 @@ void Menu::opcionBuscarRangoFecha(){
     });
 }
 
-// ===== PENDIENTES =====
 void Menu::opcionComparar(){
     std::string nombre;
     std::cout << "Nombre a buscar: ";
@@ -206,11 +206,18 @@ void Menu::opcionComparar(){
 }
 
 void Menu::opcionDOT(){
-    std::cout << "Funcion aun no implementada\n";
+
+    std::string ruta = "../output/avl.dot";
+
+    GeneradorDOT::generarAVL(gestor.obtenerAVL(), ruta);
+
+    std::cout << "Archivo generado en: " << ruta << std::endl;
+    std::cout << "Para visualizar:\n";
+    std::cout << "dot -Tpng ../output/avl.dot -o ../output/avl.png\n";
+    system("dot -Tpng ../output/avl.dot -o ../output/avl.png");
 }
 
 void Menu::cargarDesdeCSV(GestorCatalogo& gestor){
-
     std::string ruta = "../datos/productos.csv";
 
     std::vector<Producto*> productos = LectorCSV::leerArchivo(ruta);

@@ -18,6 +18,11 @@ ArbolAVL::ArbolAVL(){
     raiz = nullptr;
 }
 
+// devuelve la raiz del arbol AVL
+NodoAVL* ArbolAVL::obtenerRaiz(){
+    return raiz;
+}
+
 // devuelve la altura de un nodo
 // si el nodo no existe se considera altura 0
 int ArbolAVL::altura(NodoAVL* nodo){

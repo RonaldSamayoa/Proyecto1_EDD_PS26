@@ -4,5 +4,13 @@
 
 #ifndef PROYECTO1_GENERADOR_DOT_H
 #define PROYECTO1_GENERADOR_DOT_H
+#include <string>
+#include "../estructuras/arbol_avl.h"
 
+class GeneradorDOT {
+
+public:
+    // genera el archivo .dot del arbol AVL
+    static void generarAVL(ArbolAVL& arbol, std::string nombreArchivo);
+};
 #endif //PROYECTO1_GENERADOR_DOT_H
