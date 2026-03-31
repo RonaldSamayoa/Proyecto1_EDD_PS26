@@ -4,6 +4,7 @@
 #include "include/gestor_catalogo.h"
 #include <iostream>
 #include "include/utilidades/temporizador.h"
+#include <regex> // para validar fecha
 
 // constructor
 GestorCatalogo::GestorCatalogo(int capacidadHash, int gradoB)
@@ -14,6 +15,13 @@ GestorCatalogo::GestorCatalogo(int capacidadHash, int gradoB)
 
 // insertar en todas las estructuras
 bool GestorCatalogo::insertarProducto(Producto* producto){
+    std::string error;
+
+    if(!validarProducto(producto, error)){
+        std::cout << "Error en producto [" << producto->nombre << "]: "
+                  << error << std::endl;
+        return false;
+    }
 
     // insertar en lista base
     lista.insertarFinal(producto);
@@ -31,7 +39,6 @@ bool GestorCatalogo::insertarProducto(Producto* producto){
 }
 
 // ===== BUSQUEDAS =====
-
 Producto* GestorCatalogo::buscarPorNombre(std::string nombre){
     return avl.buscar(nombre);
 }
@@ -108,7 +115,6 @@ void GestorCatalogo::compararBusqueda(std::string nombre){
 
 // ===== ELIMINACION =====
 void GestorCatalogo::eliminarProducto(std::string nombre){
-
     // buscar el producto en el AVL
     Producto* producto = avl.buscar(nombre);
 
@@ -164,4 +170,48 @@ ArbolB& GestorCatalogo::obtenerArbolB(){
 
 ArbolBPlus& GestorCatalogo::obtenerArbolBPlus(){
     return arbolBPlus;
+}
+
+// valida si un producto es correcto
+bool GestorCatalogo::validarProducto(Producto* p, std::string& error){
+    // ===== CAMPOS VACIOS =====
+    if(p->nombre.empty() || p->codigo_barra.empty() || p->categoria.empty()
+       || p->fecha_caducidad.empty() || p->marca.empty()){
+        error = "Campos vacios";
+        return false;
+       }
+
+    // ===== CODIGO DUPLICADO =====
+    if(buscarPorCodigo(p->codigo_barra) != nullptr){
+        error = "Codigo duplicado";
+        return false;
+    }
+
+    // ===== NOMBRE DUPLICADO =====
+    if(buscarPorNombre(p->nombre) != nullptr){
+        error = "Nombre duplicado";
+        return false;
+    }
+
+    // ===== FORMATO DE FECHA (YYYY-MM-DD) =====
+    std::regex formatoFecha("^\\d{4}-\\d{2}-\\d{2}$");
+
+    if(!std::regex_match(p->fecha_caducidad, formatoFecha)){
+        error = "Formato de fecha invalido (YYYY-MM-DD)";
+        return false;
+    }
+
+    // ===== PRECIO =====
+    if(p->precio <= 0){
+        error = "Precio negativo o igual a cero";
+        return false;
+    }
+
+    // ===== STOCK =====
+    if(p->stock <= 0){
+        error = "Stock negativo o igual a cero";
+        return false;
+    }
+
+    return true; //correcto
 }

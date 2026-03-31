@@ -1,4 +1,4 @@
 digraph BPlus {
 node [shape=record];
-"0x587e9a728ee0" [label="Bebidas | Comida | Lacteos | Snacks"];
+"0x5cd9460cc890" [label="Bebidas | Comida | Lacteos | Snacks"];
 }

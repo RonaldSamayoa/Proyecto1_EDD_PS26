@@ -232,17 +232,28 @@ void Menu::cargarDesdeCSV(GestorCatalogo& gestor){
     }
 
     int insertados = 0;
+    int errores = 0;
 
+    // recorrer productos leidos del CSV
     for(auto p : productos){
-        //validar duplicados por codigo
-        if(gestor.buscarPorCodigo(p->codigo_barra) != nullptr){
-            std::cout << "Codigo duplicado ignorado: " << p->codigo_barra << "\n";
+        std::string error;
+
+        // ===== VALIDACION CENTRALIZADA =====
+        if(!gestor.validarProducto(p, error)){
+            std::cout << "[ERROR] Producto: " << p->nombre
+                      << " -> " << error << std::endl;
+            errores++;
+            delete p; // evitar fuga de memoria
             continue;
         }
 
+        // si pasa validaciones, se inserta
         gestor.insertarProducto(p);
         insertados++;
     }
 
-    std::cout << "Productos insertados: " << insertados << std::endl;
+    // ===== RESUMEN FINAL =====
+    std::cout << "\n===== RESULTADO DE CARGA =====\n";
+    std::cout << "Insertados: " << insertados << std::endl;
+    std::cout << "Errores: " << errores << std::endl;
 }
