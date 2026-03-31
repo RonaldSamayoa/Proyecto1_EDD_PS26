@@ -3,6 +3,7 @@
 //
 #include "../include/utilidades/generador_dot.h"
 #include <fstream>
+#include <iostream>
 
 // funcion auxiliar recursiva para recorrer el arbol AVL
 void recorrerAVL(std::ofstream& archivo, NodoAVL* nodo){
@@ -112,6 +113,64 @@ void GeneradorDOT::generarB(ArbolB& arbol, std::string nombreArchivo){
 
     // recorrer todo el arbol
     recorrerB(archivo, raiz);
+
+    archivo << "}\n";
+    archivo.close();
+}
+
+// funcion recursiva para recorrer el arbol B+
+void recorrerBPlus(std::ofstream& archivo, NodoBPlus* nodo){
+
+    if(nodo == nullptr)
+        return;
+
+    // ===== CREAR NODO =====
+    archivo << "\"" << nodo << "\" [label=\"";
+
+    // mostrar todas las claves del nodo
+    for(int i = 0; i < nodo->n; i++){
+        archivo << nodo->claves[i];
+
+        if(i < nodo->n - 1)
+            archivo << " | ";
+    }
+
+    archivo << "\"];\n";
+
+    // ===== SI NO ES HOJA, CONECTAR HIJOS =====
+    if(!nodo->hoja){
+
+        for(int i = 0; i <= nodo->n; i++){
+
+            if(nodo->hijos[i] != nullptr){
+
+                // crear conexion
+                archivo << "\"" << nodo << "\" -> \"" << nodo->hijos[i] << "\";\n";
+
+                // recorrer hijo
+                recorrerBPlus(archivo, nodo->hijos[i]);
+            }
+        }
+    }
+}
+
+void GeneradorDOT::generarBPlus(ArbolBPlus& arbol, std::string nombreArchivo){
+
+    std::ofstream archivo(nombreArchivo);
+
+    if(!archivo.is_open()){
+        std::cout << "Error al crear archivo B+\n";
+        return;
+    }
+
+    archivo << "digraph BPlus {\n";
+    archivo << "node [shape=record];\n";
+
+    // obtener raiz
+    NodoBPlus* raiz = arbol.obtenerRaiz();
+
+    // recorrer arbol
+    recorrerBPlus(archivo, raiz);
 
     archivo << "}\n";
     archivo.close();

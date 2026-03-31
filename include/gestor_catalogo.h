@@ -42,6 +42,7 @@ public:
     void compararBusqueda(std::string nombre);
     ArbolAVL& obtenerAVL();
     ArbolB& obtenerArbolB();
+    ArbolBPlus& obtenerArbolBPlus();
     void listarTodos();
     void listarOrdenado();
 

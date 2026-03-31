@@ -1,12 +1,12 @@
 digraph AVL {
 node [shape=record];
-"0x62fae7d27f10" [label="Pan"];
-"0x62fae7d27f10" -> "0x62fae7d26310";
-"0x62fae7d26310" [label="Galletas"];
-"0x62fae7d26310" -> "0x62fae7d26240";
-"0x62fae7d26240" [label="Cafe"];
-"0x62fae7d26310" -> "0x62fae7d260c0";
-"0x62fae7d260c0" [label="Leche"];
-"0x62fae7d27f10" -> "0x62fae7d26190";
-"0x62fae7d26190" [label="Queso"];
+"0x587e9a72af10" [label="Pan"];
+"0x587e9a72af10" -> "0x587e9a729310";
+"0x587e9a729310" [label="Galletas"];
+"0x587e9a729310" -> "0x587e9a729240";
+"0x587e9a729240" [label="Cafe"];
+"0x587e9a729310" -> "0x587e9a7290c0";
+"0x587e9a7290c0" [label="Leche"];
+"0x587e9a72af10" -> "0x587e9a729190";
+"0x587e9a729190" [label="Queso"];
 }

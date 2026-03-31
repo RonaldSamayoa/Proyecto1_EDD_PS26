@@ -17,5 +17,8 @@ public:
 
     //genera .dot para arbol B
     static void generarB(ArbolB& arbol, std::string nombreArchivo);
+
+    // genera el archivo .dot del arbol B+
+    static void generarBPlus(ArbolBPlus& arbol, std::string nombreArchivo);
 };
 #endif //PROYECTO1_GENERADOR_DOT_H

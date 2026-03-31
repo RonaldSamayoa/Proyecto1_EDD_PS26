@@ -77,6 +77,11 @@ public:
 
     // eliminar producto por categoria y nombre
     bool eliminar(std::string categoria, std::string nombre);
+
+    // devuelve la raiz del arbol (necesario para graficar)
+    NodoBPlus* obtenerRaiz(){
+        return raiz;
+    }
 };
 
 #endif //PROYECTO1_ARBOL_BPLUS_H

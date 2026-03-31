@@ -161,3 +161,7 @@ ArbolAVL& GestorCatalogo::obtenerAVL(){
 ArbolB& GestorCatalogo::obtenerArbolB(){
     return arbolB;
 }
+
+ArbolBPlus& GestorCatalogo::obtenerArbolBPlus(){
+    return arbolBPlus;
+}

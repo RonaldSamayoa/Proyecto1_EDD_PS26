@@ -210,6 +210,14 @@ void Menu::opcionDOT(){
     std::cout << "Arbol B generado en: " << rutaB << std::endl;
 
     system("dot -Tpng ../output/arbol_b.dot -o ../output/arbol_b.png");
+
+    // ===== ARBOL B+ =====
+    std::string rutaBPlus = "../output/arbol_bplus.dot";
+    GeneradorDOT::generarBPlus(gestor.obtenerArbolBPlus(), rutaBPlus);
+
+    std::cout << "Arbol B+ generado en: " << rutaBPlus << std::endl;
+    system("dot -Tpng ../output/arbol_bplus.dot -o ../output/arbol_bplus.png");
+
     std::cout << "\nImagenes generadas en carpeta /output\n";
 }
 
