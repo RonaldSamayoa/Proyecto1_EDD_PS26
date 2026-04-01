@@ -52,5 +52,6 @@ public:
     // valida producto antes de insertar
     bool validarProducto(Producto* p, std::string& error);
 
+    bool validarProductoSimple(Producto *p, std::string &error);
 };
 #endif //PROYECTO1_GESTOR_CATALOGO_H

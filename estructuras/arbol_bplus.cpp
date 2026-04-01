@@ -12,6 +12,7 @@ ArbolBPlus::ArbolBPlus(int t){
 
 // busca la hoja donde deberia estar una categoria
 NodoBPlus* ArbolBPlus::buscarHoja(NodoBPlus* nodo, std::string categoria){
+    if(nodo == nullptr) return nullptr;
 
     // si ya es hoja, devolvemos directamente
     if(nodo->hoja)
@@ -25,6 +26,9 @@ NodoBPlus* ArbolBPlus::buscarHoja(NodoBPlus* nodo, std::string categoria){
     }
 
     // bajar recursivamente al hijo correspondiente
+    if(nodo->hijos[i] == nullptr)
+        return nullptr;
+
     return buscarHoja(nodo->hijos[i], categoria);
 }
 
@@ -74,6 +78,8 @@ ListaEnlazada<Producto*>* ArbolBPlus::buscarCategoria(std::string categoria){
 
     // bajar hasta la hoja donde deberia estar la categoria
     NodoBPlus* hoja = buscarHoja(raiz, categoria);
+    if(hoja == nullptr)
+        return nullptr;
 
     // recorrer claves de la hoja
     for(int i = 0; i < hoja->n; i++){
@@ -93,12 +99,16 @@ void ArbolBPlus::dividirHoja(NodoBPlus* hoja, std::string& nuevaClave, NodoBPlus
     nuevaHoja = new NodoBPlus(t, true);
 
     // punto medio de division
-    int mitad = t;
+    int mitad = (2*t - 1)/2;
 
     // copiar la mitad derecha a la nueva hoja
     for(int i = mitad, j = 0; i < hoja->n; i++, j++){
         nuevaHoja->claves[j] = hoja->claves[i];
-        nuevaHoja->datos[j] = hoja->datos[i];
+        if(hoja->datos[i] != nullptr){
+            nuevaHoja->datos[j] = hoja->datos[i];
+        } else {
+            nuevaHoja->datos[j] = new ListaEnlazada<Producto*>();
+        }
         nuevaHoja->n++;
     }
 
@@ -114,11 +124,10 @@ void ArbolBPlus::dividirHoja(NodoBPlus* hoja, std::string& nuevaClave, NodoBPlus
 }
 
 void ArbolBPlus::insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::string& nuevaClave, NodoBPlus*& nuevoNodo){
-
-    // CASO 1: nodo hoja
+    // CASO 1: NODO HOJA
     if(nodo->hoja){
 
-        // buscar si ya existe la categoria
+        // 1. Si ya existe la categoría → solo insertar en lista
         for(int i = 0; i < nodo->n; i++){
             if(nodo->claves[i] == producto->categoria){
                 nodo->datos[i]->insertarFinal(producto);
@@ -127,7 +136,21 @@ void ArbolBPlus::insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::strin
             }
         }
 
-        // insertar normalmente
+        // 2. SI ESTÁ LLENO → DIVIDIR ANTES
+        if(nodo->n == 2*t - 1){
+
+            dividirHoja(nodo, nuevaClave, nuevoNodo);
+
+            // decidir a cuál hoja ir
+            if(producto->categoria >= nuevaClave){
+                insertarNoLleno(nuevoNodo, producto, nuevaClave, nuevoNodo);
+            } else {
+                insertarNoLleno(nodo, producto, nuevaClave, nuevoNodo);
+            }
+            return;
+        }
+
+        // 3. INSERTAR NORMAL (YA HAY ESPACIO)
         int i = nodo->n - 1;
 
         while(i >= 0 && producto->categoria < nodo->claves[i]){
@@ -142,68 +165,57 @@ void ArbolBPlus::insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::strin
 
         nodo->n++;
 
-        // si no hay desbordamiento terminamos
-        if(nodo->n < 2*t){
-            nuevoNodo = nullptr;
-            return;
-        }
-
-        // SPLIT DE HOJA
-        dividirHoja(nodo, nuevaClave, nuevoNodo);
+        nuevoNodo = nullptr;
         return;
     }
 
-    // CASO 2: nodo interno
-    int i = nodo->n - 1;
+    // CASO 2: NODO INTERNO
+    int i = 0;
 
     // buscar hijo adecuado
-    while(i >= 0 && producto->categoria < nodo->claves[i]){
-        i--;
-    }
-    i++;
-
-    std::string claveSube;
-    NodoBPlus* nuevoHijo = nullptr;
-
-    // insertar recursivamente en hijo
-    insertarNoLleno(nodo->hijos[i], producto, claveSube, nuevoHijo);
-
-    // si no hubo split en el hijo no hay nada que hacer
-    if(nuevoHijo == nullptr){
-        nuevoNodo = nullptr;
-        return;
+    while(i < nodo->n && producto->categoria >= nodo->claves[i]){
+        i++;
     }
 
-    // buscar posicion correcta para insertar la clave subida
-    int pos = i;
-
-    while(pos < nodo->n && nodo->claves[pos] < claveSube){
-        pos++;
+    //SEGURIDAD
+    if(nodo->hijos[i] == nullptr){
+        nodo->hijos[i] = new NodoBPlus(t, true);
     }
 
-    // mover claves e hijos para abrir espacio
-    for(int j = nodo->n; j > pos; j--){
-        nodo->claves[j] = nodo->claves[j-1];
-        nodo->hijos[j+1] = nodo->hijos[j];
+    // 🔥 SI HIJO ESTÁ LLENO → SPLIT ANTES
+    // =========================
+    if(nodo->hijos[i]->n == 2*t - 1){
+
+        std::string claveSube;
+        NodoBPlus* nuevoHijo = nullptr;
+
+        if(nodo->hijos[i]->hoja){
+            dividirHoja(nodo->hijos[i], claveSube, nuevoHijo);
+        } else {
+            dividirNodoInterno(nodo->hijos[i], claveSube, nuevoHijo);
+        }
+
+        // insertar clave en nodo actual
+        for(int j = nodo->n; j > i; j--){
+            nodo->claves[j] = nodo->claves[j-1];
+            nodo->hijos[j+1] = nodo->hijos[j];
+        }
+
+        nodo->claves[i] = claveSube;
+        nodo->hijos[i+1] = nuevoHijo;
+        nodo->n++;
+
+        // decidir a cuál hijo bajar
+        if(producto->categoria >= claveSube){
+            i++;
+        }
     }
 
-    // insertar nueva clave y nuevo hijo
-    nodo->claves[pos] = claveSube;
-    nodo->hijos[pos+1] = nuevoHijo;
+    // INSERTAR RECURSIVAMENTE
+    insertarNoLleno(nodo->hijos[i], producto, nuevaClave, nuevoNodo);
 
-    nodo->n++;
-
-    // si no hay desbordamiento
-    if(nodo->n < 2*t){
-        nuevoNodo = nullptr;
-        return;
-    }
-
-    // si hay desbordamiento en nodo interno
-    if(nodo->n >= 2*t){
-        dividirNodoInterno(nodo, nuevaClave, nuevoNodo);
-        return;
-    }
+    // En este enfoque (split antes), NO propagamos splits hacia arriba aquí
+    nuevoNodo = nullptr;
 }
 
 void ArbolBPlus::dividirNodoInterno(NodoBPlus* nodo, std::string& nuevaClave, NodoBPlus*& nuevoNodo){
@@ -211,28 +223,26 @@ void ArbolBPlus::dividirNodoInterno(NodoBPlus* nodo, std::string& nuevaClave, No
     // crear nuevo nodo interno (NO hoja)
     nuevoNodo = new NodoBPlus(t, false);
 
-    int mitad = t; // punto de division
+    int mitad = (2*t - 1)/2; // punto de division
 
     // la clave que sube al padre es la del medio
     nuevaClave = nodo->claves[mitad];
 
-    // mover claves a la derecha (sin incluir la que sube)
+    // ===== COPIAR CLAVES =====
     int j = 0;
     for(int i = mitad + 1; i < nodo->n; i++){
-        nuevoNodo->claves[j] = nodo->claves[i];
-        j++;
+        nuevoNodo->claves[j++] = nodo->claves[i];
     }
 
-    // mover hijos correspondientes
+    // ===== COPIAR HIJOS =====
     j = 0;
     for(int i = mitad + 1; i <= nodo->n; i++){
-        nuevoNodo->hijos[j] = nodo->hijos[i];
-        j++;
+        nuevoNodo->hijos[j++] = nodo->hijos[i];
     }
 
     // actualizar tamanios
     nuevoNodo->n = nodo->n - mitad - 1;
-    nodo->n = mitad;
+    nodo->n = mitad; //limpiar original
 }
 
 // recorre todas las categorias del arbol B+ en orden y utiliza los punteros 'siguiente' para ir hoja por hoja
@@ -259,9 +269,11 @@ void ArbolBPlus::recorrerCategorias(){
             std::cout << "Categoria: " << actual->claves[i] << std::endl;
 
             // recorrer lista de productos de esa categoria
-            actual->datos[i]->recorrer([](Producto* p){
-                std::cout << "  - " << p->nombre << std::endl;
-            });
+            if(actual->datos[i] != nullptr){
+                actual->datos[i]->recorrer([](Producto* p){
+                    std::cout << "  - " << p->nombre << std::endl;
+                });
+            }
         }
 
         // avanzar a la siguiente hoja
@@ -336,6 +348,8 @@ bool ArbolBPlus::eliminarRec(NodoBPlus* nodo, std::string categoria, std::string
         i++;
     }
 
+    if (nodo->hijos[i]== nullptr)
+        return false;
     // bajar recursivamente
     bool eliminado = eliminarRec(nodo->hijos[i], categoria, nombre);
 
@@ -343,7 +357,7 @@ bool ArbolBPlus::eliminarRec(NodoBPlus* nodo, std::string categoria, std::string
         return false;
 
     // verificar si el hijo tiene menos claves de las permitidas
-    if(nodo->hijos[i]->n < (t - 1)){
+    if(nodo->hijos[i] != nullptr && nodo->hijos[i]->n < (t - 1)){
         // arreglar el arbol
         manejarSubdesbordamiento(nodo->hijos[i], nodo, i);
     }

@@ -222,6 +222,7 @@ void Menu::opcionDOT(){
 }
 
 void Menu::cargarDesdeCSV(GestorCatalogo& gestor){
+
     std::string ruta = "../datos/productos.csv";
 
     std::vector<Producto*> productos = LectorCSV::leerArchivo(ruta);
@@ -234,25 +235,44 @@ void Menu::cargarDesdeCSV(GestorCatalogo& gestor){
     int insertados = 0;
     int errores = 0;
 
-    // recorrer productos leidos del CSV
     for(auto p : productos){
+
         std::string error;
 
-        // ===== VALIDACION CENTRALIZADA =====
-        if(!gestor.validarProducto(p, error)){
+        // ===== VALIDACION SIMPLE =====
+        if(!gestor.validarProductoSimple(p, error)){
             std::cout << "[ERROR] Producto: " << p->nombre
                       << " -> " << error << std::endl;
+
+            delete p;
             errores++;
-            delete p; // evitar fuga de memoria
             continue;
         }
 
-        // si pasa validaciones, se inserta
+        // ===== VALIDAR DUPLICADOS (YA EN ESTRUCTURAS) =====
+        if(gestor.buscarPorCodigo(p->codigo_barra) != nullptr){
+            std::cout << "[ERROR] Codigo duplicado: "
+                      << p->codigo_barra << std::endl;
+
+            delete p;
+            errores++;
+            continue;
+        }
+
+        if(gestor.buscarPorNombre(p->nombre) != nullptr){
+            std::cout << "[ERROR] Nombre duplicado: "
+                      << p->nombre << std::endl;
+
+            delete p;
+            errores++;
+            continue;
+        }
+
+        // ===== INSERTAR =====
         gestor.insertarProducto(p);
         insertados++;
     }
 
-    // ===== RESUMEN FINAL =====
     std::cout << "\n===== RESULTADO DE CARGA =====\n";
     std::cout << "Insertados: " << insertados << std::endl;
     std::cout << "Errores: " << errores << std::endl;

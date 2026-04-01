@@ -215,3 +215,31 @@ bool GestorCatalogo::validarProducto(Producto* p, std::string& error){
 
     return true; //correcto
 }
+
+bool GestorCatalogo::validarProductoSimple(Producto* p, std::string& error){
+
+    if(p->nombre.empty() || p->codigo_barra.empty() || p->categoria.empty()
+       || p->fecha_caducidad.empty() || p->marca.empty()){
+        error = "Campos vacios";
+        return false;
+       }
+
+    std::regex formatoFecha("^\\d{4}-\\d{2}-\\d{2}$");
+
+    if(!std::regex_match(p->fecha_caducidad, formatoFecha)){
+        error = "Formato de fecha invalido (YYYY-MM-DD)";
+        return false;
+    }
+
+    if(p->precio <= 0){
+        error = "Precio invalido";
+        return false;
+    }
+
+    if(p->stock <= 0){
+        error = "Stock invalido";
+        return false;
+    }
+
+    return true;
+}

@@ -40,6 +40,15 @@ public:
 
         n = 0;
         siguiente = nullptr;
+
+        //INICIALIZAR
+        for(int i = 0; i < 2*t; i++){
+            hijos[i] = nullptr;
+        }
+
+        for(int i = 0; i < 2*t - 1; i++){
+            datos[i] = nullptr;
+        }
     }
 };
 

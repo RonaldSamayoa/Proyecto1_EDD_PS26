@@ -32,27 +32,39 @@ std::vector<Producto*> LectorCSV::leerArchivo(std::string ruta){
 
         std::vector<std::string> campos;
 
-        // separar por comas
         while(getline(ss, dato, ',')){
             campos.push_back(dato);
         }
 
-        // validar que tenga todos los campos
-        if(campos.size() != 7)
+        // validar cantidad de campos
+        if(campos.size() != 7){
+            std::cout << "[ERROR CSV] Linea ignorada (columnas incorrectas): "
+                      << linea << std::endl;
             continue;
+        }
 
-        // crear producto
-        Producto* p = new Producto{
-            campos[0],                 // nombre
-            campos[1],                 // codigo
-            campos[2],                 // categoria
-            campos[3],                 // fecha
-            campos[4],                 // marca
-            stod(campos[5]),           // precio
-            stoi(campos[6])            // stock
-        };
+        try{
+            // convertir valores numericos SEGURO
+            double precio = std::stod(campos[5]);
+            int stock = std::stoi(campos[6]);
 
-        productos.push_back(p);
+            Producto* p = new Producto{
+                campos[0],
+                campos[1],
+                campos[2],
+                campos[3],
+                campos[4],
+                precio,
+                stock
+            };
+
+            productos.push_back(p);
+
+        }catch(const std::exception& e){
+            std::cout << "[ERROR CSV] Linea ignorada (conversion invalida): "
+                      << linea << std::endl;
+            continue; // no truena el programa
+        }
     }
 
     archivo.close();
