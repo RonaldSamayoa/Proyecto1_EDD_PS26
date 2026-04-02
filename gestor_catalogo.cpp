@@ -231,6 +231,26 @@ bool GestorCatalogo::validarProductoSimple(Producto* p, std::string& error){
         return false;
     }
 
+    // ===== VALIDACION REAL DE FECHA =====
+    int anio = std::stoi(p->fecha_caducidad.substr(0,4));
+    int mes  = std::stoi(p->fecha_caducidad.substr(5,2));
+    int dia  = std::stoi(p->fecha_caducidad.substr(8,2));
+
+    // validar mes
+    if(mes < 1 || mes > 12){
+        error = "Mes invalido";
+        return false;
+    }
+
+    // dias por mes
+    int diasMes[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+
+    // validar dia
+    if(dia < 1 || dia > diasMes[mes-1]){
+        error = "Dia invalido";
+        return false;
+    }
+
     if(p->precio <= 0){
         error = "Precio invalido";
         return false;
