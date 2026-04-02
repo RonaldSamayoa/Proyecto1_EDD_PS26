@@ -127,29 +127,29 @@ void recorrerBPlus(std::ofstream& archivo, NodoBPlus* nodo){
     // ===== CREAR NODO =====
     archivo << "\"" << nodo << "\" [label=\"";
 
-    // mostrar todas las claves del nodo
     for(int i = 0; i < nodo->n; i++){
         archivo << nodo->claves[i];
-
         if(i < nodo->n - 1)
             archivo << " | ";
     }
 
     archivo << "\"];\n";
 
-    // ===== SI NO ES HOJA, CONECTAR HIJOS =====
-    if(!nodo->hoja){
+    // ===== DEBUG: mostrar hijos aunque sean null =====
+    for(int i = 0; i <= nodo->n; i++){
 
-        for(int i = 0; i <= nodo->n; i++){
+        if(nodo->hijos[i] != nullptr){
 
-            if(nodo->hijos[i] != nullptr){
+            archivo << "\"" << nodo << "\" -> \"" << nodo->hijos[i] << "\";\n";
 
-                // crear conexion
-                archivo << "\"" << nodo << "\" -> \"" << nodo->hijos[i] << "\";\n";
+            recorrerBPlus(archivo, nodo->hijos[i]);
 
-                // recorrer hijo
-                recorrerBPlus(archivo, nodo->hijos[i]);
-            }
+        } else {
+            // 🔥 ESTO ES CLAVE PARA VER EL ERROR
+            std::string nullNode = "null_" + std::to_string((long long)nodo) + "_" + std::to_string(i);
+
+            archivo << "\"" << nullNode << "\" [shape=point];\n";
+            archivo << "\"" << nodo << "\" -> \"" << nullNode << "\";\n";
         }
     }
 }

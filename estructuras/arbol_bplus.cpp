@@ -124,10 +124,11 @@ void ArbolBPlus::dividirHoja(NodoBPlus* hoja, std::string& nuevaClave, NodoBPlus
 }
 
 void ArbolBPlus::insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::string& nuevaClave, NodoBPlus*& nuevoNodo){
-    // CASO 1: NODO HOJA
+
+    // ===== CASO HOJA =====
     if(nodo->hoja){
 
-        // 1. Si ya existe la categoría → solo insertar en lista
+        // ya existe categoría
         for(int i = 0; i < nodo->n; i++){
             if(nodo->claves[i] == producto->categoria){
                 nodo->datos[i]->insertarFinal(producto);
@@ -136,21 +137,7 @@ void ArbolBPlus::insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::strin
             }
         }
 
-        // 2. SI ESTÁ LLENO → DIVIDIR ANTES
-        if(nodo->n == 2*t - 1){
-
-            dividirHoja(nodo, nuevaClave, nuevoNodo);
-
-            // decidir a cuál hoja ir
-            if(producto->categoria >= nuevaClave){
-                insertarNoLleno(nuevoNodo, producto, nuevaClave, nuevoNodo);
-            } else {
-                insertarNoLleno(nodo, producto, nuevaClave, nuevoNodo);
-            }
-            return;
-        }
-
-        // 3. INSERTAR NORMAL (YA HAY ESPACIO)
+        // insertar ordenado
         int i = nodo->n - 1;
 
         while(i >= 0 && producto->categoria < nodo->claves[i]){
@@ -165,56 +152,55 @@ void ArbolBPlus::insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::strin
 
         nodo->n++;
 
+        // 💥 SPLIT DESPUÉS DE INSERTAR
+        if(nodo->n == 2*t - 1){
+
+            dividirHoja(nodo, nuevaClave, nuevoNodo);
+            return;
+        }
+
         nuevoNodo = nullptr;
         return;
     }
 
-    // CASO 2: NODO INTERNO
-    int i = 0;
+    // ===== CASO INTERNO =====
+    int i = nodo->n - 1;
 
-    // buscar hijo adecuado
-    while(i < nodo->n && producto->categoria >= nodo->claves[i]){
-        i++;
+    while(i >= 0 && producto->categoria < nodo->claves[i]){
+        i--;
+    }
+    i++;
+
+    std::string claveSube;
+    NodoBPlus* nuevoHijo = nullptr;
+
+    insertarNoLleno(nodo->hijos[i], producto, claveSube, nuevoHijo);
+
+    // 🔥 SI NO HUBO SPLIT → SALIR
+    if(nuevoHijo == nullptr){
+        nuevoNodo = nullptr;
+        return;
     }
 
-    //SEGURIDAD
-    if(nodo->hijos[i] == nullptr){
-        nodo->hijos[i] = new NodoBPlus(t, true);
+    // 🔥 INSERTAR CLAVE SUBIDA EN ESTE NODO
+    int j = nodo->n - 1;
+
+    while(j >= i){
+        nodo->claves[j+1] = nodo->claves[j];
+        nodo->hijos[j+2] = nodo->hijos[j+1];
+        j--;
     }
 
-    // 🔥 SI HIJO ESTÁ LLENO → SPLIT ANTES
-    // =========================
-    if(nodo->hijos[i]->n == 2*t - 1){
+    nodo->claves[i] = claveSube;
+    nodo->hijos[i+1] = nuevoHijo;
+    nodo->n++;
 
-        std::string claveSube;
-        NodoBPlus* nuevoHijo = nullptr;
-
-        if(nodo->hijos[i]->hoja){
-            dividirHoja(nodo->hijos[i], claveSube, nuevoHijo);
-        } else {
-            dividirNodoInterno(nodo->hijos[i], claveSube, nuevoHijo);
-        }
-
-        // insertar clave en nodo actual
-        for(int j = nodo->n; j > i; j--){
-            nodo->claves[j] = nodo->claves[j-1];
-            nodo->hijos[j+1] = nodo->hijos[j];
-        }
-
-        nodo->claves[i] = claveSube;
-        nodo->hijos[i+1] = nuevoHijo;
-        nodo->n++;
-
-        // decidir a cuál hijo bajar
-        if(producto->categoria >= claveSube){
-            i++;
-        }
+    // 💥 SPLIT INTERNO
+    if(nodo->n == 2*t - 1){
+        dividirNodoInterno(nodo, nuevaClave, nuevoNodo);
+        return;
     }
 
-    // INSERTAR RECURSIVAMENTE
-    insertarNoLleno(nodo->hijos[i], producto, nuevaClave, nuevoNodo);
-
-    // En este enfoque (split antes), NO propagamos splits hacia arriba aquí
     nuevoNodo = nullptr;
 }
 
