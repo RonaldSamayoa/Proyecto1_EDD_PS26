@@ -269,7 +269,7 @@ void Menu::cargarDesdeCSV(GestorCatalogo& gestor){
         }
 
         // ===== INSERTAR =====
-        gestor.insertarProducto(p);
+        gestor.insertarProductoSinValidar(p);
         insertados++;
     }
 

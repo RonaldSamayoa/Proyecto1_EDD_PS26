@@ -38,6 +38,17 @@ bool GestorCatalogo::insertarProducto(Producto* producto){
     return true;
 }
 
+bool GestorCatalogo::insertarProductoSinValidar(Producto* producto){
+    lista.insertarFinal(producto);
+    listaOrdenada->insertar(producto);
+    avl.insertar(producto);
+    hash.insertar(producto);
+    arbolB.insertar(producto);
+    arbolBPlus.insertar(producto);
+
+    return true;
+}
+
 // ===== BUSQUEDAS =====
 Producto* GestorCatalogo::buscarPorNombre(std::string nombre){
     return avl.buscar(nombre);
@@ -198,6 +209,26 @@ bool GestorCatalogo::validarProducto(Producto* p, std::string& error){
 
     if(!std::regex_match(p->fecha_caducidad, formatoFecha)){
         error = "Formato de fecha invalido (YYYY-MM-DD)";
+        return false;
+    }
+
+    // ===== VALIDACION REAL DE FECHA =====
+    int anio = std::stoi(p->fecha_caducidad.substr(0,4));
+    int mes  = std::stoi(p->fecha_caducidad.substr(5,2));
+    int dia  = std::stoi(p->fecha_caducidad.substr(8,2));
+
+    // validar mes
+    if(mes < 1 || mes > 12){
+        error = "Mes invalido";
+        return false;
+    }
+
+    // dias por mes
+    int diasMes[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+
+    // validar dia
+    if(dia < 1 || dia > diasMes[mes-1]){
+        error = "Dia invalido";
         return false;
     }
 

@@ -31,6 +31,7 @@ public:
 
     // insertar producto en TODAS las estructuras
     bool insertarProducto(Producto* producto);
+    bool insertarProductoSinValidar(Producto* producto);
 
     // busquedas
     Producto* buscarPorNombre(std::string nombre);
