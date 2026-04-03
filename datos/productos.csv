@@ -1,70 +1,34 @@
 nombre,codigo_barra,categoria,fecha_caducidad,marca,precio,stock
 Pan,001,Comida,2026-01-10,Bimbo,5.0,10
 Leche,002,Lacteos,2026-01-05,DosPinos,8.0,20
-Arroz,003,Granos,2026-06-01,Gallo,12.5,30
-Frijol,004,Granos,2026-07-01,Gallo,10.0,25
-Azucar,005,Granos,2026-08-01,LaCaña,6.5,40
-Cafe,006,Bebidas,2026-03-01,Nescafe,12.0,15
-Te,007,Bebidas,2026-04-01,Lipton,9.0,18
-Jugo,008,Bebidas,2026-02-01,DelMonte,7.5,12
-Agua,009,Bebidas,2027-01-01,PuraVida,3.0,50
-Galletas,010,Snacks,2026-05-01,Gamesa,8.0,20
-Chocolate,011,Snacks,2026-09-01,Hershey,15.0,10
-Cereal,012,Desayuno,2026-10-01,Kellogs,18.0,12
-Miel,013,Desayuno,2027-01-01,Natural,20.0,8
-Huevos,014,Lacteos,2026-01-15,Granja,25.0,30
-Queso,015,Lacteos,2026-01-20,Kraft,22.0,10
+Queso,003,Lacteos,2026-02-01,Sula,15.0,5
+Cafe,004,Bebidas,2026-03-01,Nescafe,12.0,8
+Galletas,005,Snacks,2026-04-01,Gamesa,7.5,15
 
-# ------- GENERADOS VALIDOS -------
-Producto16,016,Cat1,2026-02-01,Marca1,5.0,10
-Producto17,017,Cat2,2026-03-01,Marca2,6.0,11
-Producto18,018,Cat3,2026-04-01,Marca3,7.0,12
-Producto19,019,Cat4,2026-05-01,Marca4,8.0,13
-Producto20,020,Cat5,2026-06-01,Marca5,9.0,14
-Producto21,021,Cat1,2026-07-01,Marca1,10.0,15
-Producto22,022,Cat2,2026-08-01,Marca2,11.0,16
-Producto23,023,Cat3,2026-09-01,Marca3,12.0,17
-Producto24,024,Cat4,2026-10-01,Marca4,13.0,18
-Producto25,025,Cat5,2026-11-01,Marca5,14.0,19
-Producto26,026,Cat1,2026-12-01,Marca1,15.0,20
-Producto27,027,Cat2,2027-01-01,Marca2,16.0,21
-Producto28,028,Cat3,2027-02-01,Marca3,17.0,22
-Producto29,029,Cat4,2027-03-01,Marca4,18.0,23
-Producto30,030,Cat5,2027-04-01,Marca5,19.0,24
+# ===== DUPLICADOS =====
+Pan,006,Comida,2026-05-01,Bimbo,6.0,12
+Azucar,002,Comida,2026-06-01,LaCana,4.5,10
 
-# (continúa patrón hasta 190 productos válidos)
-Producto31,031,Cat1,2026-02-01,Marca1,5.5,10
-Producto32,032,Cat2,2026-03-01,Marca2,6.5,11
-Producto33,033,Cat3,2026-04-01,Marca3,7.5,12
-Producto34,034,Cat4,2026-05-01,Marca4,8.5,13
-Producto35,035,Cat5,2026-06-01,Marca5,9.5,14
-Producto36,036,Cat1,2026-07-01,Marca1,10.5,15
-Producto37,037,Cat2,2026-08-01,Marca2,11.5,16
-Producto38,038,Cat3,2026-09-01,Marca3,12.5,17
-Producto39,039,Cat4,2026-10-01,Marca4,13.5,18
-Producto40,040,Cat5,2026-11-01,Marca5,14.5,19
+# ===== CAMPOS VACIOS =====
+,007,Comida,2026-07-01,Genérica,3.0,5
+Sal,008,,2026-08-01,Salina,2.0,10
+Aceite,009,Comida,,Capullo,10.0,7
+Arroz,010,Comida,2026-09-01,,6.0,20
 
-# ------- ERRORES -------
-Pan,001,Comida,2026-01-10,Bimbo,5.0,10
-Leche,002,Lacteos,2026-01-05,DosPinos,8.0,20
-,050,Cat1,2026-02-01,Marca1,5.0,10
-ProductoError1,,Cat2,2026-03-01,Marca2,6.0,10
-ProductoError2,052,,2026-04-01,Marca3,7.0,10
-ProductoError3,053,Cat3,2026/04/01,Marca3,7.0,10
-ProductoError4,054,Cat4,2026-05-01,Marca4,abc,10
-ProductoError5,055,Cat5,2026-06-01,Marca5,9.0,xyz
-ProductoError6,056,Cat1,,Marca1,10.0,10
-ProductoError7,057,Cat2,2026-08-01,,11.0,10
-ProductoError8,058,Cat3,2026-09-01,Marca3,12.0,
-ProductoError9,059,Cat4,2026-10-01,Marca4,-5.0,10
-ProductoError10,060,Cat5,2026-11-01,Marca5,14.0,-1
-ProductoError11,061,Cat1,2026-12-01,Marca1,0,0
-ProductoError12,062,Cat2,2026-13-01,Marca2,10.0,10
-ProductoError13,063,Cat3,2026-00-01,Marca3,10.0,10
-ProductoError14,064,Cat4,2026-01-32,Marca4,10.0,10
-ProductoError15,065,Cat5,2026-01-10,Marca5,10.0,
-ProductoError16,066,Cat1,2026-01-10,Marca1,,10
-ProductoError17,067,Cat2,2026-01-10,Marca2,10.0,
-ProductoError18,068,Cat3,2026-01-10,Marca3,,
-ProductoError19,069,Cat4,2026-01-10,Marca4, ,10
-ProductoError20,070,Cat5,2026-01-10,Marca5,10.0,
+# ===== FORMATO DE FECHA INCORRECTO =====
+Frijol,011,Comida,01-10-2026,DonPedro,9.0,15
+Maiz,012,Comida,2026/10/01,Maseca,8.0,10
+
+# ===== VALORES NEGATIVOS =====
+Chocolate,013,Snacks,2026-11-01,Hershey,-5.0,10
+Gaseosa,014,Bebidas,2026-12-01,CocaCola,10.0,-3
+
+# ===== CEROS (casos dudosos) =====
+Agua,015,Bebidas,2026-12-10,Pura,0.0,10
+Jugo,016,Bebidas,2026-12-15,DelValle,5.0,0
+
+# ===== DATOS VALIDOS EXTRA =====
+Manzana,017,Frutas,2026-03-10,Natural,2.5,30
+Banano,018,Frutas,2026-03-15,Natural,1.5,25
+Pollo,019,Carnes,2026-02-20,Granja,20.0,12
+Res,020,Carnes,2026-02-25,Granja,25.0,8

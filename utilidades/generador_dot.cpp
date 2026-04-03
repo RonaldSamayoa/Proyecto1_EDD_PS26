@@ -7,32 +7,25 @@
 
 // funcion auxiliar recursiva para recorrer el arbol AVL
 void recorrerAVL(std::ofstream& archivo, NodoAVL* nodo){
-    // caso base: nodo nulo
-    if(nodo == nullptr)
+    static int nivel = 0;  // 👈 contador de profundidad
+    if(nodo == nullptr || nivel > 4)  //Limitante
         return;
 
-    // ===== CREAR NODO =====
-    // usamos la direccion de memoria como identificador unico
+    nivel++;
+
     archivo << "\"" << nodo << "\" [label=\""
             << nodo->producto->nombre << "\"];\n";
 
-    // ===== HIJO IZQUIERDO =====
     if(nodo->izquierda != nullptr){
-
-        // crear conexion
         archivo << "\"" << nodo << "\" -> \"" << nodo->izquierda << "\";\n";
-
-        // recorrer recursivamente
         recorrerAVL(archivo, nodo->izquierda);
     }
 
-    // ===== HIJO DERECHO =====
     if(nodo->derecha != nullptr){
-
         archivo << "\"" << nodo << "\" -> \"" << nodo->derecha << "\";\n";
-
         recorrerAVL(archivo, nodo->derecha);
     }
+    nivel--; //bajar nivel al regresar
 }
 
 // genera archivo .dot del arbol AVL
@@ -135,21 +128,15 @@ void recorrerBPlus(std::ofstream& archivo, NodoBPlus* nodo){
 
     archivo << "\"];\n";
 
-    // ===== DEBUG: mostrar hijos aunque sean null =====
-    for(int i = 0; i <= nodo->n; i++){
+    // ===== SOLO HIJOS REALES =====
+    if(!nodo->hoja){
+        for(int i = 0; i <= nodo->n; i++){
+            if(nodo->hijos[i] != nullptr){
 
-        if(nodo->hijos[i] != nullptr){
+                archivo << "\"" << nodo << "\" -> \"" << nodo->hijos[i] << "\";\n";
 
-            archivo << "\"" << nodo << "\" -> \"" << nodo->hijos[i] << "\";\n";
-
-            recorrerBPlus(archivo, nodo->hijos[i]);
-
-        } else {
-            // 🔥 ESTO ES CLAVE PARA VER EL ERROR
-            std::string nullNode = "null_" + std::to_string((long long)nodo) + "_" + std::to_string(i);
-
-            archivo << "\"" << nullNode << "\" [shape=point];\n";
-            archivo << "\"" << nodo << "\" -> \"" << nullNode << "\";\n";
+                recorrerBPlus(archivo, nodo->hijos[i]);
+            }
         }
     }
 }

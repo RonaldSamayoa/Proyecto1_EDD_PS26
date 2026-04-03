@@ -35,7 +35,7 @@ NodoBPlus* ArbolBPlus::buscarHoja(NodoBPlus* nodo, std::string categoria){
 // inserta un producto
 void ArbolBPlus::insertar(Producto* producto){
 
-    // arbol vacio → crear raiz hoja
+    // arbol vacio entonces se crea raiz hoja
     if(raiz == nullptr){
 
         raiz = new NodoBPlus(t, true);
@@ -94,7 +94,6 @@ ListaEnlazada<Producto*>* ArbolBPlus::buscarCategoria(std::string categoria){
 
 // divide una hoja en dos cuando esta llena
 void ArbolBPlus::dividirHoja(NodoBPlus* hoja, std::string& nuevaClave, NodoBPlus*& nuevaHoja){
-
     // crear nueva hoja
     nuevaHoja = new NodoBPlus(t, true);
 
@@ -124,7 +123,6 @@ void ArbolBPlus::dividirHoja(NodoBPlus* hoja, std::string& nuevaClave, NodoBPlus
 }
 
 void ArbolBPlus::insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::string& nuevaClave, NodoBPlus*& nuevoNodo){
-
     // ===== CASO HOJA =====
     if(nodo->hoja){
 
@@ -152,7 +150,7 @@ void ArbolBPlus::insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::strin
 
         nodo->n++;
 
-        // 💥 SPLIT DESPUÉS DE INSERTAR
+        //SPLIT DESPUÉS DE INSERTAR
         if(nodo->n == 2*t - 1){
 
             dividirHoja(nodo, nuevaClave, nuevoNodo);
@@ -176,13 +174,13 @@ void ArbolBPlus::insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::strin
 
     insertarNoLleno(nodo->hijos[i], producto, claveSube, nuevoHijo);
 
-    // 🔥 SI NO HUBO SPLIT → SALIR
+    //SI NO HUBO SPLIT ENTONCES SALIR
     if(nuevoHijo == nullptr){
         nuevoNodo = nullptr;
         return;
     }
 
-    // 🔥 INSERTAR CLAVE SUBIDA EN ESTE NODO
+    //NSERTAR CLAVE SUBIDA EN ESTE NODO
     int j = nodo->n - 1;
 
     while(j >= i){
@@ -195,7 +193,7 @@ void ArbolBPlus::insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::strin
     nodo->hijos[i+1] = nuevoHijo;
     nodo->n++;
 
-    // 💥 SPLIT INTERNO
+    //SPLIT INTERNO
     if(nodo->n == 2*t - 1){
         dividirNodoInterno(nodo, nuevaClave, nuevoNodo);
         return;
@@ -205,7 +203,6 @@ void ArbolBPlus::insertarNoLleno(NodoBPlus* nodo, Producto* producto, std::strin
 }
 
 void ArbolBPlus::dividirNodoInterno(NodoBPlus* nodo, std::string& nuevaClave, NodoBPlus*& nuevoNodo){
-
     // crear nuevo nodo interno (NO hoja)
     nuevoNodo = new NodoBPlus(t, false);
 
@@ -315,10 +312,8 @@ bool ArbolBPlus::eliminarRec(NodoBPlus* nodo, std::string categoria, std::string
                         nodo->claves[j] = nodo->claves[j+1];
                         nodo->datos[j] = nodo->datos[j+1];
                     }
-
                     nodo->n--;
                 }
-
                 return true;
             }
         }
@@ -352,7 +347,6 @@ bool ArbolBPlus::eliminarRec(NodoBPlus* nodo, std::string categoria, std::string
 
 // maneja subdesbordamiento en un nodo
 void ArbolBPlus::manejarSubdesbordamiento(NodoBPlus* nodo, NodoBPlus* padre, int indice){
-
     // ===== 1. INTENTAR CON HERMANO IZQUIERDO =====
     if(indice > 0){
         NodoBPlus* hermanoIzq = padre->hijos[indice - 1];
@@ -381,13 +375,11 @@ void ArbolBPlus::manejarSubdesbordamiento(NodoBPlus* nodo, NodoBPlus* padre, int
 
             // ===== CASO NODO INTERNO =====
             else{
-
                 // mover claves e hijos del nodo a la derecha
                 for(int i = nodo->n; i > 0; i--){
                     nodo->claves[i] = nodo->claves[i-1];
                     nodo->hijos[i+1] = nodo->hijos[i];
                 }
-
                 nodo->hijos[1] = nodo->hijos[0];
 
                 // bajar clave del padre
@@ -402,7 +394,7 @@ void ArbolBPlus::manejarSubdesbordamiento(NodoBPlus* nodo, NodoBPlus* padre, int
                 nodo->n++;
                 hermanoIzq->n--;
             }
-            return; // ya resolvimos
+            return;
         }
     }
 
@@ -456,7 +448,6 @@ void ArbolBPlus::manejarSubdesbordamiento(NodoBPlus* nodo, NodoBPlus* padre, int
             return; // ya resolvimos
         }
     }
-
     // ===== 3. SI NO SE PUEDE PRESTAR, FUSIONAR =====
     // intentar fusion con hermano izquierdo
     if(indice > 0){

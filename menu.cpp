@@ -76,7 +76,6 @@ void Menu::mostrarMenu(){
 }
 
 // ===== IMPLEMENTADAS =====
-
 void Menu::opcionInsertar(){
     Producto* p = new Producto();
 
@@ -101,9 +100,13 @@ void Menu::opcionInsertar(){
     std::cout << "Stock: ";
     std::cin >> p->stock;
 
-    gestor.insertarProducto(p);
+    if (gestor.insertarProducto(p)) {
+        std::cout << "Producto agregado\n";
+    } else {
+        std::cout << "No se pudo agregar el producto \n";
+        delete p; //evitar fuga de memoria
+    }
 
-    std::cout << "Producto agregado\n";
 }
 
 void Menu::opcionBuscarNombre(){
@@ -201,7 +204,7 @@ void Menu::opcionDOT(){
     GeneradorDOT::generarAVL(gestor.obtenerAVL(), rutaAVL);
 
     std::cout << "AVL generado en: " << rutaAVL << std::endl;
-    system("dot -Tpng ../output/avl.dot -o ../output/avl.png");
+    system("dot -Tpng ../output/avl.dot -o ../output/avl.svg");
 
     // ===== ARBOL B =====
     std::string rutaB = "../output/arbol_b.dot";
@@ -209,14 +212,14 @@ void Menu::opcionDOT(){
     GeneradorDOT::generarB(gestor.obtenerArbolB(), rutaB);
     std::cout << "Arbol B generado en: " << rutaB << std::endl;
 
-    system("dot -Tpng ../output/arbol_b.dot -o ../output/arbol_b.png");
+    system("dot -Tpng ../output/arbol_b.dot -o ../output/arbol_b.svg");
 
     // ===== ARBOL B+ =====
     std::string rutaBPlus = "../output/arbol_bplus.dot";
     GeneradorDOT::generarBPlus(gestor.obtenerArbolBPlus(), rutaBPlus);
 
     std::cout << "Arbol B+ generado en: " << rutaBPlus << std::endl;
-    system("dot -Tpng ../output/arbol_bplus.dot -o ../output/arbol_bplus.png");
+    system("dot -Tpng ../output/arbol_bplus.dot -o ../output/arbol_bplus.svg");
 
     std::cout << "\nImagenes generadas en carpeta /output\n";
 }
