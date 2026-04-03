@@ -1,0 +1,34 @@
+nombre,codigo_barra,categoria,fecha_caducidad,marca,precio,stock
+Pan,001,Comida,2026-01-10,Bimbo,5.0,10
+Leche,002,Lacteos,2026-01-05,DosPinos,8.0,20
+Queso,003,Lacteos,2026-02-01,Sula,15.0,5
+Cafe,004,Bebidas,2026-03-01,Nescafe,12.0,8
+Galletas,005,Snacks,2026-04-01,Gamesa,7.5,15
+
+# ===== DUPLICADOS =====
+Pan,006,Comida,2026-05-01,Bimbo,6.0,12
+Azucar,002,Comida,2026-06-01,LaCana,4.5,10
+
+# ===== CAMPOS VACIOS =====
+,007,Comida,2026-07-01,Genérica,3.0,5
+Sal,008,,2026-08-01,Salina,2.0,10
+Aceite,009,Comida,,Capullo,10.0,7
+Arroz,010,Comida,2026-09-01,,6.0,20
+
+# ===== FORMATO DE FECHA INCORRECTO =====
+Frijol,011,Comida,01-10-2026,DonPedro,9.0,15
+Maiz,012,Comida,2026/10/01,Maseca,8.0,10
+
+# ===== VALORES NEGATIVOS =====
+Chocolate,013,Snacks,2026-11-01,Hershey,-5.0,10
+Gaseosa,014,Bebidas,2026-12-01,CocaCola,10.0,-3
+
+# ===== CEROS (casos dudosos) =====
+Agua,015,Bebidas,2026-12-10,Pura,0.0,10
+Jugo,016,Bebidas,2026-12-15,DelValle,5.0,0
+
+# ===== DATOS VALIDOS EXTRA =====
+Manzana,017,Frutas,2026-03-10,Natural,2.5,30
+Banano,018,Frutas,2026-03-15,Natural,1.5,25
+Pollo,019,Carnes,2026-02-20,Granja,20.0,12
+Res,020,Carnes,2026-02-25,Granja,25.0,8
